@@ -241,9 +241,9 @@
                     <div class="space-y-3">
                         <div class="flex justify-between items-center px-1">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resolution</span>
-                            <span id="resLabel" class="text-[10px] font-bold text-slate-600 dark:text-slate-400">1000px</span>
+                            <span id="resLabel" class="text-[10px] font-bold text-slate-600 dark:text-slate-400">1024px (Digital Std.)</span>
                         </div>
-                        <input type="range" id="exportRes" min="500" max="3000" step="500" value="1000" class="w-full" />
+                        <input type="range" id="exportRes" min="256" max="4096" step="256" value="1024" class="w-full" />
                     </div>
 
                     <button id="downloadBtn" class="w-full py-5 rounded-3xl font-bold text-white shadow-xl bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3">
@@ -251,7 +251,7 @@
                         <span>Export QR Code</span>
                     </button>
                     
-                    <p class="text-[10px] text-center text-slate-400 font-medium">Rendered using vector logic for maximum print quality.</p>
+                    <p class="text-[10px] text-center text-slate-400 font-medium italic">Standard QR sizes range from 256px (Small) to 4096px (Pro Print).</p>
                 </div>
 
             </div>
@@ -292,7 +292,7 @@
             isBgTransparent: false,
             logoSize: 0.3,
             logoMargin: 10,
-            exportSize: 1000
+            exportSize: 1024
         };
 
         // --- Initialization ---
@@ -466,7 +466,14 @@
         // Export
         document.getElementById('exportRes').addEventListener('input', (e) => {
             config.exportSize = parseInt(e.target.value);
-            document.getElementById('resLabel').textContent = config.exportSize + 'px';
+            let labelText = config.exportSize + 'px';
+            
+            if (config.exportSize <= 512) labelText += ' (Small/Web)';
+            else if (config.exportSize <= 1024) labelText += ' (Digital Std.)';
+            else if (config.exportSize <= 2048) labelText += ' (High-Res/Marketing)';
+            else labelText += ' (Professional Print)';
+            
+            document.getElementById('resLabel').textContent = labelText;
         });
 
         document.getElementById('downloadBtn').addEventListener('click', () => {
