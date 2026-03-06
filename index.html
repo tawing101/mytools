@@ -72,26 +72,7 @@
                     </a>
                 </div>
 
-                <!-- Tool 2: Focus Timer -->
-                <div class="relative group h-full">
-                    <button onclick="toggleFavorite('focus-timer')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
-                        <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="focus-timer"></i>
-                    </button>
-                    <a href="focus-timer.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                            <i data-lucide="timer" class="w-6 h-6"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Focus Timer</h3>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
-                            A minimalist Pomodoro timer to help you track work sessions and manage productivity.
-                        </p>
-                        <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Tool 3: Link Shortener -->
+                <!-- Tool 2: Link Shortener -->
                 <div class="relative group h-full">
                     <button onclick="toggleFavorite('link-shortener')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
                         <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="link-shortener"></i>
@@ -103,6 +84,25 @@
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Link Shortener</h3>
                         <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
                             Instantly shrink long, messy URLs into clean, shareable links.
+                        </p>
+                        <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Tool 3: Unit Converter -->
+                <div class="relative group h-full">
+                    <button onclick="toggleFavorite('unit-converter')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                        <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="unit-converter"></i>
+                    </button>
+                    <a href="unit-converter.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="arrow-left-right" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Unit Converter</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
+                            Instantly convert currencies (PHP to USD), length, weight, and temperature measurements with live rates.
                         </p>
                         <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
                             Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
@@ -187,10 +187,8 @@
 
         function updateDarkModeUI(isDark) {
             const dot = document.getElementById('darkModeDot');
-            if (isDark) {
-                dot.style.transform = 'translateX(24px)';
-            } else {
-                dot.style.transform = 'translateX(0px)';
+            if (dot) {
+                dot.style.transform = isDark ? 'translateX(24px)' : 'translateX(0px)';
             }
         }
 
@@ -231,7 +229,9 @@
         function renderFavorites() {
             const grid = document.getElementById('favorites-grid');
             const favTools = Array.from(document.querySelectorAll('#tab-apps .group')).filter(card => {
-                const toolId = card.querySelector('.fav-icon').getAttribute('data-tool');
+                const iconEl = card.querySelector('.fav-icon');
+                if (!iconEl) return false;
+                const toolId = iconEl.getAttribute('data-tool');
                 return favorites.includes(toolId);
             });
 
@@ -254,8 +254,7 @@
 
         function clearAllData() {
             if(confirm('Are you sure you want to reset all data? This will clear favorites and theme settings.')) {
-                localStorage.removeItem('tawing_favorites');
-                localStorage.removeItem('tawing_theme');
+                localStorage.clear();
                 favorites = [];
                 document.documentElement.classList.remove('dark');
                 updateDarkModeUI(false);
