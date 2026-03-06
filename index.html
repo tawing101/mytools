@@ -8,6 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-link.active { color: #2563eb; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans selection:bg-blue-200 min-h-screen flex flex-col">
 
@@ -21,9 +26,9 @@
                 <h1 class="text-xl font-bold text-slate-900 tracking-tight">Tawing Tools</h1>
             </div>
             <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-500">
-                <a href="#" class="text-blue-600 hover:text-blue-700 transition-colors">My Apps</a>
-                <a href="#" class="hover:text-slate-800 transition-colors">Favorites</a>
-                <a href="#" class="hover:text-slate-800 transition-colors">Settings</a>
+                <button onclick="switchTab('apps')" id="nav-apps" class="nav-link active hover:text-blue-600 transition-colors">My Apps</button>
+                <button onclick="switchTab('favorites')" id="nav-favorites" class="nav-link hover:text-blue-600 transition-colors">Favorites</button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="nav-link hover:text-blue-600 transition-colors">Settings</button>
             </nav>
         </div>
     </header>
@@ -31,57 +36,114 @@
     <!-- Main Content -->
     <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-12">
         
-        <div class="mb-10">
-            <h2 class="text-3xl font-bold text-slate-900">Welcome back</h2>
-            <p class="text-slate-500 mt-2">Select a tool below to get started.</p>
+        <!-- APPS TAB -->
+        <div id="tab-apps" class="tab-content active">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Welcome back</h2>
+                <p class="text-slate-500 mt-2">Select a tool below to get started.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tool 1: QR Studio -->
+                <div class="relative group h-full">
+                    <button onclick="toggleFavorite('qr-studio')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                        <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="qr-studio"></i>
+                    </button>
+                    <a href="qr-studio.html" class="flex flex-col h-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="qr-code" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">QR Studio</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                            Create clean, fully customized QR codes with logos, custom shapes, and gradients. Rendered securely offline.
+                        </p>
+                        <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Tool 2: Focus Timer -->
+                <div class="relative group h-full">
+                    <button onclick="toggleFavorite('focus-timer')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                        <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="focus-timer"></i>
+                    </button>
+                    <a href="focus-timer.html" class="flex flex-col h-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="timer" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Focus Timer</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                            A minimalist Pomodoro timer to help you track work sessions and manage productivity.
+                        </p>
+                        <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Tool 3: Link Shortener -->
+                <div class="relative group h-full">
+                    <button onclick="toggleFavorite('link-shortener')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                        <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="link-shortener"></i>
+                    </button>
+                    <a href="link-shortener.html" class="flex flex-col h-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="link-2" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Link Shortener</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                            Instantly shrink long, messy URLs into clean, shareable links.
+                        </p>
+                        <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Tools Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- Tool 1: QR Studio (Active) -->
-            <a href="qr-studio.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="qr-code" class="w-6 h-6"></i>
+        <!-- FAVORITES TAB -->
+        <div id="tab-favorites" class="tab-content">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Your Favorites</h2>
+                <p class="text-slate-500 mt-2">Tools you've marked for quick access.</p>
+            </div>
+            <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Favorites will be mirrored here via JS -->
+                <div class="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-slate-200">
+                    <i data-lucide="heart" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                    <p class="text-slate-400">No favorites yet. Heart a tool to see it here!</p>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">QR Studio</h3>
-                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
-                    Create clean, fully customized QR codes with logos, custom shapes, and gradients. Rendered securely offline.
-                </p>
-                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
-                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- Tool 2: Focus Timer (Active) -->
-            <a href="focus-timer.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="timer" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Focus Timer</h3>
-                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
-                    A minimalist Pomodoro timer to help you track work sessions and manage productivity.
-                </p>
-                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
-                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
-            <!-- Tool 3: Link Shortener (Active) -->
-            <a href="link-shortener.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="link-2" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 mb-2">Link Shortener</h3>
-                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
-                    Instantly shrink long, messy URLs into clean, shareable links.
-                </p>
-                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
-                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
-                </div>
-            </a>
-
+            </div>
         </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="tab-content">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Settings</h2>
+                <p class="text-slate-500 mt-2">Manage your Tawing Tools preferences.</p>
+            </div>
+            <div class="max-w-2xl bg-white rounded-3xl border border-slate-200 p-8 space-y-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-900">Dark Mode</h4>
+                        <p class="text-sm text-slate-500">Adjust the interface for night viewing.</p>
+                    </div>
+                    <button class="w-12 h-6 bg-slate-200 rounded-full relative transition-colors hover:bg-slate-300">
+                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between border-t border-slate-100 pt-8">
+                    <div>
+                        <h4 class="font-bold text-slate-900">Clear Data</h4>
+                        <p class="text-sm text-slate-500">Remove all favorites and local storage settings.</p>
+                    </div>
+                    <button onclick="clearAllData()" class="px-4 py-2 text-sm font-bold text-red-500 hover:bg-red-50 rounded-xl transition-colors">Reset</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
@@ -96,8 +158,84 @@
     </footer>
 
     <script>
-        // Initialize Icons
+        // Tab Logic
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            
+            // Show selected
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.getElementById('nav-' + tabName).classList.add('active');
+            
+            if (tabName === 'favorites') renderFavorites();
+        }
+
+        // Favorites Logic
+        let favorites = JSON.parse(localStorage.getItem('tawing_favorites')) || [];
+
+        function toggleFavorite(toolId) {
+            const index = favorites.indexOf(toolId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(toolId);
+            }
+            localStorage.setItem('tawing_favorites', JSON.stringify(favorites));
+            updateHeartIcons();
+        }
+
+        function updateHeartIcons() {
+            document.querySelectorAll('.fav-icon').forEach(icon => {
+                const toolId = icon.getAttribute('data-tool');
+                if (favorites.includes(toolId)) {
+                    icon.classList.add('text-red-500', 'fill-red-500');
+                    icon.classList.remove('text-slate-300');
+                } else {
+                    icon.classList.remove('text-red-500', 'fill-red-500');
+                    icon.classList.add('text-slate-300');
+                }
+            });
+        }
+
+        function renderFavorites() {
+            const grid = document.getElementById('favorites-grid');
+            const favTools = Array.from(document.querySelectorAll('#tab-apps .group')).filter(card => {
+                const toolId = card.querySelector('.fav-icon').getAttribute('data-tool');
+                return favorites.includes(toolId);
+            });
+
+            if (favTools.length > 0) {
+                grid.innerHTML = '';
+                favTools.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    // Update the onclick since cloneNode doesn't clone event listeners added via addEventListener 
+                    // (but our onclick is inline so it's fine)
+                    grid.appendChild(clone);
+                });
+            } else {
+                grid.innerHTML = `
+                    <div class="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-slate-200">
+                        <i data-lucide="heart" class="w-12 h-12 text-slate-200 mx-auto mb-4"></i>
+                        <p class="text-slate-400">No favorites yet. Heart a tool to see it here!</p>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        function clearAllData() {
+            if(confirm('Are you sure you want to reset all data? This will clear favorites.')) {
+                localStorage.removeItem('tawing_favorites');
+                favorites = [];
+                updateHeartIcons();
+                switchTab('apps');
+            }
+        }
+
+        // Initialize
         lucide.createIcons();
+        updateHeartIcons();
     </script>
 </body>
 </html>
