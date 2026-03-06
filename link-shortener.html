@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Shortener | Tawing Tools</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Hide element utility */
+        .hidden-el { display: none !important; }
+        
+        /* Custom scrollbar for history panel */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-white text-slate-800 font-sans selection:bg-blue-200">
+
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        
+        <!-- LEFT PANEL: Action Area -->
+        <div class="flex-1 p-6 lg:p-12 overflow-y-auto relative">
+            <div class="max-w-xl mx-auto space-y-10 mt-4 lg:mt-10">
+                
+                <header>
+                    <a href="index.html" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-600 transition-colors mb-6">
+                        <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Dashboard
+                    </a>
+                    <h1 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <i data-lucide="link-2" class="text-blue-600 w-8 h-8"></i>
+                        Link Shortener
+                    </h1>
+                    <p class="text-slate-500 mt-2 text-sm">Instantly shrink long, messy URLs into clean, shareable links.</p>
+                </header>
+
+                <!-- Input Section -->
+                <section class="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <form id="shortenForm" class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                                <i data-lucide="globe" class="w-4 h-4"></i> Long URL
+                            </label>
+                            <input type="url" id="longUrlInput" required placeholder="https://your-very-long-and-messy-website-link.com/article/123"
+                                class="w-full px-5 py-4 rounded-xl bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 font-medium placeholder:text-slate-300 shadow-sm" />
+                        </div>
+                        
+                        <button type="submit" id="shortenBtn" class="w-full py-4 rounded-xl font-bold text-white shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i id="btnIcon" data-lucide="zap" class="w-5 h-5"></i>
+                            <span id="btnText">Shorten Link</span>
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Result Section -->
+                <section id="resultSection" class="hidden-el space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                    <div class="p-6 rounded-3xl border border-green-200 bg-green-50 shadow-sm">
+                        <div class="flex items-center gap-2 text-green-700 mb-4">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                            <span class="font-bold text-sm">Successfully Shortened!</span>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div class="flex-1 bg-white border border-green-200 rounded-xl px-4 py-3 flex items-center overflow-hidden">
+                                <span id="shortUrlOutput" class="text-slate-800 font-bold truncate">https://is.gd/example</span>
+                            </div>
+                            
+                            <button id="copyBtn" class="flex-shrink-0 px-6 py-3 rounded-xl font-bold text-green-700 bg-green-200 hover:bg-green-300 transition-colors flex items-center justify-center gap-2">
+                                <i id="copyIcon" data-lucide="copy" class="w-4 h-4"></i>
+                                <span id="copyText">Copy</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Original Link Reference -->
+                        <div class="mt-4 pt-4 border-t border-green-200/50">
+                            <p class="text-xs text-green-600/70 font-medium truncate flex items-center gap-1.5">
+                                <i data-lucide="corner-down-right" class="w-3 h-3 flex-shrink-0"></i>
+                                <span id="originalUrlOutput" class="truncate"></span>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Error Message -->
+                <div id="errorMsg" class="hidden-el p-4 rounded-xl bg-red-50 text-red-600 border border-red-100 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+                    <span id="errorText">Unable to shorten this link. Please check the URL and try again.</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Sticky History -->
+        <div class="w-full lg:w-[400px] xl:w-[450px] bg-slate-50 border-t lg:border-t-0 lg:border-l border-slate-200 flex flex-col p-8 lg:p-12 lg:sticky lg:top-0 lg:h-screen">
+            
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <i data-lucide="history" class="w-4 h-4"></i> Recent Links
+                </h2>
+                <button id="clearHistoryBtn" class="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors hidden-el">
+                    Clear All
+                </button>
+            </div>
+            
+            <div id="historyList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+                <!-- Empty State -->
+                <div id="emptyHistory" class="flex flex-col items-center justify-center h-48 text-center px-4">
+                    <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                        <i data-lucide="ghost" class="w-6 h-6"></i>
+                    </div>
+                    <p class="text-sm font-medium text-slate-500">No links shortened yet</p>
+                    <p class="text-xs text-slate-400 mt-1">Your recent links will appear here.</p>
+                </div>
+                
+                <!-- History Items injected here by JS -->
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // --- DOM Elements ---
+        const form = document.getElementById('shortenForm');
+        const urlInput = document.getElementById('longUrlInput');
+        const shortenBtn = document.getElementById('shortenBtn');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnText = document.getElementById('btnText');
+        
+        const resultSection = document.getElementById('resultSection');
+        const shortUrlOutput = document.getElementById('shortUrlOutput');
+        const originalUrlOutput = document.getElementById('originalUrlOutput');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyIcon = document.getElementById('copyIcon');
+        const copyText = document.getElementById('copyText');
+        
+        const errorMsg = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+        
+        const historyList = document.getElementById('historyList');
+        const emptyHistory = document.getElementById('emptyHistory');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        // --- State ---
+        // Load history from localStorage or start empty
+        let linkHistory = JSON.parse(localStorage.getItem('tawing_short_links')) || [];
+
+        // --- Core Logic ---
+
+        // Function to securely shorten URL bypassing CORS using JSONP
+        function shortenUrl(longUrl) {
+            return new Promise((resolve, reject) => {
+                // Generate a unique callback function name
+                const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+                
+                // Define the callback function globally
+                window[callbackName] = function(data) {
+                    // Cleanup
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    
+                    if (data.shorturl) {
+                        resolve(data.shorturl);
+                    } else {
+                        reject(data.errormessage || 'Unknown error occurred');
+                    }
+                };
+
+                // Create and inject the script tag
+                const script = document.createElement('script');
+                // We use is.gd API because it's free, requires no auth, and supports JSONP for client-side apps
+                script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${callbackName}`;
+                
+                script.onerror = () => {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject('Network error. Please check your connection.');
+                };
+
+                document.body.appendChild(script);
+            });
+        }
+
+        // Handle Form Submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const longUrl = urlInput.value.trim();
+            if (!longUrl) return;
+
+            // Basic URL validation
+            if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
+                showError('Please enter a valid URL starting with http:// or https://');
+                return;
+            }
+
+            // Set UI to loading state
+            setLoadingState(true);
+            hideError();
+            resultSection.classList.add('hidden-el');
+
+            try {
+                const shortUrl = await shortenUrl(longUrl);
+                
+                // Show Result
+                shortUrlOutput.textContent = shortUrl;
+                originalUrlOutput.textContent = longUrl;
+                resultSection.classList.remove('hidden-el');
+                
+                // Add to History
+                addToHistory(longUrl, shortUrl);
+                
+                // Reset copy button if it was in "Copied" state
+                resetCopyButton();
+
+            } catch (err) {
+                showError(err);
+            } finally {
+                setLoadingState(false);
+            }
+        });
+
+        // Handle Copy Action
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = shortUrlOutput.textContent;
+            
+            // Fallback clipboard method for older browsers or non-HTTPS local environments
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showCopiedState);
+            } else {
+                let textArea = document.createElement("textarea");
+                textArea.value = textToCopy;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopiedState();
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                    alert("Unable to copy automatically. Please select and copy manually.");
+                }
+                textArea.remove();
+            }
+        });
+
+        function showCopiedState() {
+            copyIcon.setAttribute('data-lucide', 'check');
+            copyText.textContent = 'Copied!';
+            copyBtn.classList.replace('bg-green-200', 'bg-green-600');
+            copyBtn.classList.replace('text-green-700', 'text-white');
+            copyBtn.classList.replace('hover:bg-green-300', 'hover:bg-green-700');
+            lucide.createIcons();
+            
+            setTimeout(resetCopyButton, 3000);
+        }
+
+        function resetCopyButton() {
+            copyIcon.setAttribute('data-lucide', 'copy');
+            copyText.textContent = 'Copy';
+            copyBtn.classList.replace('bg-green-600', 'bg-green-200');
+            copyBtn.classList.replace('text-white', 'text-green-700');
+            copyBtn.classList.replace('hover:bg-green-700', 'hover:bg-green-300');
+            lucide.createIcons();
+        }
+
+        // --- History Management ---
+        
+        function addToHistory(longUrl, shortUrl) {
+            // Add to beginning of array
+            const newItem = {
+                id: Date.now(),
+                longUrl: longUrl,
+                shortUrl: shortUrl,
+                date: new Date().toLocaleDateString()
+            };
+            
+            linkHistory.unshift(newItem);
+            
+            // Keep only the last 20 links to prevent localStorage overflow
+            if (linkHistory.length > 20) linkHistory.pop();
+            
+            // Save & Render
+            localStorage.setItem('tawing_short_links', JSON.stringify(linkHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            // Clear existing list except empty state
+            const items = historyList.querySelectorAll('.history-item');
+            items.forEach(item => item.remove());
+
+            if (linkHistory.length === 0) {
+                emptyHistory.classList.remove('hidden-el');
+                clearHistoryBtn.classList.add('hidden-el');
+                return;
+            }
+
+            emptyHistory.classList.add('hidden-el');
+            clearHistoryBtn.classList.remove('hidden-el');
+
+            linkHistory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hover:border-blue-200 transition-colors group';
+                
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <a href="${item.shortUrl}" target="_blank" class="font-bold text-blue-600 hover:text-blue-800 transition-colors truncate pr-4">
+                            ${item.shortUrl}
+                        </a>
+                        <button onclick="copyFromHistory('${item.shortUrl}', this)" class="text-slate-400 hover:text-blue-600 transition-colors bg-slate-50 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 focus:opacity-100" title="Copy to clipboard">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-xs text-slate-400">
+                        <i data-lucide="corner-down-right" class="w-3 h-3 flex-shrink-0"></i>
+                        <span class="truncate" title="${item.longUrl}">${item.longUrl}</span>
+                    </div>
+                `;
+                historyList.appendChild(div);
+            });
+            
+            lucide.createIcons();
+        }
+
+        // Global function for history copy buttons
+        window.copyFromHistory = function(text, btnElement) {
+            const icon = btnElement.querySelector('i');
+            
+            // Fallback clipboard execution
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            textArea.remove();
+
+            // Visual feedback
+            icon.setAttribute('data-lucide', 'check');
+            icon.classList.add('text-green-500');
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                icon.setAttribute('data-lucide', 'copy');
+                icon.classList.remove('text-green-500');
+                lucide.createIcons();
+            }, 2000);
+        };
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if(confirm('Are you sure you want to clear your link history?')) {
+                linkHistory = [];
+                localStorage.removeItem('tawing_short_links');
+                renderHistory();
+            }
+        });
+
+        // --- UI Helpers ---
+        function setLoadingState(isLoading) {
+            shortenBtn.disabled = isLoading;
+            if (isLoading) {
+                btnIcon.setAttribute('data-lucide', 'loader-2');
+                btnIcon.classList.add('animate-spin');
+                btnText.textContent = 'Shrinking...';
+            } else {
+                btnIcon.setAttribute('data-lucide', 'zap');
+                btnIcon.classList.remove('animate-spin');
+                btnText.textContent = 'Shorten Link';
+            }
+            lucide.createIcons();
+        }
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorMsg.classList.remove('hidden-el');
+        }
+
+        function hideError() {
+            errorMsg.classList.add('hidden-el');
+        }
+
+        // Initial render
+        renderHistory();
+
+    </script>
+</body>
+</html>

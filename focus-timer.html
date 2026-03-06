@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Timer | Tawing Tools</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans selection:bg-blue-200 min-h-screen">
+    
+    <div class="max-w-5xl mx-auto p-6 md:p-12">
+        
+        <!-- Header -->
+        <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <a href="index.html" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-600 transition-colors mb-4">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Dashboard
+                </a>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900">Focus Dashboard</h1>
+                <p class="text-slate-500 mt-2">Your clean space to think, plan, and execute.</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Timer & Notes -->
+            <div class="md:col-span-5 space-y-6">
+                
+                <!-- Pomodoro Timer -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Focus Timer</h2>
+                    <div id="timerDisplay" class="text-6xl font-light tabular-nums tracking-tight text-slate-800 mb-8">
+                        25:00
+                    </div>
+                    <div class="flex gap-4">
+                        <button id="playPauseBtn" class="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+                            <i id="playPauseIcon" data-lucide="play" class="w-6 h-6 ml-1"></i>
+                        </button>
+                        <button id="resetBtn" class="flex items-center justify-center w-14 h-14 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+                            <i data-lucide="rotate-ccw" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Notes -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col h-64">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Quick Notes</h2>
+                    <textarea id="notesArea" class="w-full flex-grow resize-none outline-none text-slate-700 bg-transparent placeholder:text-slate-300" placeholder="Type your thoughts here..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Tasks -->
+            <div class="md:col-span-7">
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 h-full min-h-[500px] flex flex-col">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-6">Today's Tasks</h2>
+                    
+                    <!-- Task Form -->
+                    <form id="taskForm" class="flex gap-3 mb-8">
+                        <input type="text" id="taskInput" placeholder="What needs to be done?" autocomplete="off"
+                            class="flex-grow px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700" />
+                        <button type="submit" class="px-4 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors flex items-center justify-center">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+
+                    <!-- Task List -->
+                    <div id="taskList" class="flex-grow overflow-y-auto pr-2 space-y-3">
+                        <!-- Tasks inject here via JS -->
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- State Management ---
+        let tasks = [
+            { id: 1, text: 'Define my big goal for the day', completed: false },
+            { id: 2, text: 'Drink a glass of water', completed: true }
+        ];
+        
+        // Timer State
+        const WORK_TIME = 25 * 60; // 25 minutes in seconds
+        let timeLeft = WORK_TIME;
+        let isTimerActive = false;
+        let timerInterval = null;
+
+        // --- DOM Elements ---
+        const timerDisplay = document.getElementById('timerDisplay');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        const resetBtn = document.getElementById('resetBtn');
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+
+        // --- Timer Logic ---
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(timeLeft);
+        }
+
+        function toggleTimer() {
+            isTimerActive = !isTimerActive;
+            
+            if (isTimerActive) {
+                // Update Icon to Pause
+                playPauseIcon.setAttribute('data-lucide', 'pause');
+                playPauseIcon.classList.remove('ml-1'); // Remove play button offset
+                lucide.createIcons();
+                
+                // Start Interval
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        // Timer finished
+                        clearInterval(timerInterval);
+                        isTimerActive = false;
+                        playPauseIcon.setAttribute('data-lucide', 'play');
+                        playPauseIcon.classList.add('ml-1');
+                        lucide.createIcons();
+                        alert('Focus session complete! Time for a break.'); // Optional notification
+                    }
+                }, 1000);
+            } else {
+                // Pause Timer
+                clearInterval(timerInterval);
+                playPauseIcon.setAttribute('data-lucide', 'play');
+                playPauseIcon.classList.add('ml-1');
+                lucide.createIcons();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerActive = false;
+            timeLeft = WORK_TIME;
+            updateTimerDisplay();
+            
+            playPauseIcon.setAttribute('data-lucide', 'play');
+            playPauseIcon.classList.add('ml-1');
+            lucide.createIcons();
+        }
+
+        // --- Task Logic ---
+        function renderTasks() {
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="text-center text-slate-400 mt-10">
+                        <p>All caught up! Enjoy your day.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            taskList.innerHTML = tasks.map(task => `
+                <div class="group flex items-center justify-between p-4 rounded-xl border transition-all ${task.completed ? 'bg-slate-50 border-transparent' : 'bg-white border-slate-100 shadow-sm hover:border-blue-100'}">
+                    <div class="flex items-center gap-4 overflow-hidden flex-grow cursor-pointer" onclick="toggleTask(${task.id})">
+                        <button class="flex-shrink-0 transition-colors ${task.completed ? 'text-blue-500' : 'text-slate-300 hover:text-blue-400'}">
+                            <i data-lucide="${task.completed ? 'check-circle' : 'circle'}" class="w-6 h-6"></i>
+                        </button>
+                        <span class="truncate ${task.completed ? 'text-slate-400 line-through' : 'text-slate-700'}">
+                            ${task.text}
+                        </span>
+                    </div>
+                    <button onclick="deleteTask(${task.id})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100 ml-4">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            // Re-initialize icons for newly injected HTML
+            lucide.createIcons();
+        }
+
+        function addTask(e) {
+            e.preventDefault();
+            const text = taskInput.value.trim();
+            if (!text) return;
+            
+            tasks.push({
+                id: Date.now(),
+                text: text,
+                completed: false
+            });
+            
+            taskInput.value = '';
+            renderTasks();
+        }
+
+        // Expose these functions to the global window so inline onclick handlers work
+        window.toggleTask = function(id) {
+            tasks = tasks.map(task => 
+                task.id === id ? { ...task, completed: !task.completed } : task
+            );
+            renderTasks();
+        };
+
+        window.deleteTask = function(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            renderTasks();
+        };
+
+        // --- Event Listeners & Initialization ---
+        playPauseBtn.addEventListener('click', toggleTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        taskForm.addEventListener('submit', addTask);
+
+        // Initial Render
+        updateTimerDisplay();
+        renderTasks();
+        lucide.createIcons();
+
+    </script>
+</body>
+</html>

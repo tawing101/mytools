@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tawing Tools</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans selection:bg-blue-200 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 tracking-tight">Tawing Tools</h1>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-500">
+                <a href="#" class="text-blue-600 hover:text-blue-700 transition-colors">My Apps</a>
+                <a href="#" class="hover:text-slate-800 transition-colors">Favorites</a>
+                <a href="#" class="hover:text-slate-800 transition-colors">Settings</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-12">
+        
+        <div class="mb-10">
+            <h2 class="text-3xl font-bold text-slate-900">Welcome back</h2>
+            <p class="text-slate-500 mt-2">Select a tool below to get started.</p>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Tool 1: QR Studio (Active) -->
+            <a href="qr-studio.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="qr-code" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">QR Studio</h3>
+                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                    Create clean, fully customized QR codes with logos, custom shapes, and gradients. Rendered securely offline.
+                </p>
+                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Tool 2: Focus Timer (Active) -->
+            <a href="focus-timer.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="timer" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Focus Timer</h3>
+                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                    A minimalist Pomodoro timer to help you track work sessions and manage productivity.
+                </p>
+                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+            <!-- Tool 3: Link Shortener (Active) -->
+            <a href="link-shortener.html" class="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all flex flex-col h-full">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="link-2" class="w-6 h-6"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-900 mb-2">Link Shortener</h3>
+                <p class="text-slate-500 text-sm leading-relaxed mb-6 flex-grow">
+                    Instantly shrink long, messy URLs into clean, shareable links.
+                </p>
+                <div class="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                    Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500 gap-4">
+            <p>&copy; 2026 Tawing Tools. All rights reserved.</p>
+            <div class="flex gap-4">
+                <a href="#" class="hover:text-slate-800 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-slate-800 transition-colors">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
