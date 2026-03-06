@@ -16,17 +16,21 @@
     <style>
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .nav-link.active { color: #2563eb; }
         
         /* Smooth transitions for theme switching */
         body { transition: background-color 0.3s ease, color 0.3s ease; }
         .dark-mode-toggle-dot { transition: transform 0.2s ease; }
+
+        /* Navigation Active States */
+        .nav-link.active { color: #2563eb; }
+        .mobile-nav-link.active { color: #2563eb; }
+        .mobile-nav-link.active i { transform: translateY(-2px); transition: transform 0.2s; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-blue-200 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-blue-200 min-h-screen flex flex-col pb-20 md:pb-0">
 
-    <!-- Header -->
-    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10">
+    <!-- Header (Desktop) -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
         <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 text-white p-2 rounded-lg">
@@ -34,78 +38,102 @@
                 </div>
                 <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Tawing Tools</h1>
             </div>
-            <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
-                <button onclick="switchTab('apps')" id="nav-apps" class="nav-link active hover:text-blue-600 transition-colors">My Apps</button>
-                <button onclick="switchTab('favorites')" id="nav-favorites" class="nav-link hover:text-blue-600 transition-colors">Favorites</button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="nav-link hover:text-blue-600 transition-colors">Settings</button>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <button onclick="switchTab('apps')" id="nav-apps" class="nav-link active hover:text-blue-600 transition-colors flex items-center gap-2">
+                    <i data-lucide="layout-grid" class="w-4 h-4"></i> My Apps
+                </button>
+                <button onclick="switchTab('favorites')" id="nav-favorites" class="nav-link hover:text-blue-600 transition-colors flex items-center gap-2">
+                    <i data-lucide="heart" class="w-4 h-4"></i> Favorites
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="nav-link hover:text-blue-600 transition-colors flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4"></i> Settings
+                </button>
             </nav>
         </div>
     </header>
 
+    <!-- Mobile Bottom Navigation -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 py-3 z-40 flex justify-around items-center shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('apps')" id="mob-nav-apps" class="mobile-nav-link active flex flex-col items-center gap-1 transition-all">
+            <i data-lucide="layout-grid" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Apps</span>
+        </button>
+        <button onclick="switchTab('favorites')" id="mob-nav-favorites" class="mobile-nav-link flex flex-col items-center gap-1 text-slate-400 transition-all">
+            <i data-lucide="heart" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Favs</span>
+        </button>
+        <button onclick="switchTab('settings')" id="mob-nav-settings" class="mobile-nav-link flex flex-col items-center gap-1 text-slate-400 transition-all">
+            <i data-lucide="settings" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold uppercase tracking-tighter">Setup</span>
+        </button>
+    </div>
+
     <!-- Main Content -->
-    <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-12">
+    <main class="flex-grow max-w-6xl mx-auto w-full px-6 py-8 md:py-12">
         
         <!-- APPS TAB -->
         <div id="tab-apps" class="tab-content active">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Welcome back</h2>
-                <p class="text-slate-500 dark:text-slate-400 mt-2">Select a tool below to get started.</p>
+            <div class="mb-8 md:mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Welcome back</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 md:mt-2 text-sm md:text-base">Select a tool below to get started.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <!-- Tool 1: QR Studio -->
                 <div class="relative group h-full">
-                    <button onclick="toggleFavorite('qr-studio')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                    <button onclick="toggleFavorite('qr-studio')" class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
                         <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="qr-studio"></i>
                     </button>
-                    <a href="qr-studio.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <a href="qr-studio.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <i data-lucide="qr-code" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">QR Studio</h3>
                         <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
                             Create clean, fully customized QR codes with logos, custom shapes, and gradients. Rendered securely offline.
                         </p>
-                        <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="flex items-center text-sm font-bold text-blue-600 dark:text-blue-400">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </a>
                 </div>
 
                 <!-- Tool 2: Link Shortener -->
                 <div class="relative group h-full">
-                    <button onclick="toggleFavorite('link-shortener')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                    <button onclick="toggleFavorite('link-shortener')" class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
                         <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="link-shortener"></i>
                     </button>
-                    <a href="link-shortener.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <a href="link-shortener.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <i data-lucide="link-2" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Link Shortener</h3>
                         <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
                             Instantly shrink long, messy URLs into clean, shareable links.
                         </p>
-                        <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="flex items-center text-sm font-bold text-blue-600 dark:text-blue-400">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </a>
                 </div>
 
                 <!-- Tool 3: Unit Converter -->
                 <div class="relative group h-full">
-                    <button onclick="toggleFavorite('unit-converter')" class="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
+                    <button onclick="toggleFavorite('unit-converter')" class="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-100 dark:border-slate-700 text-slate-300 hover:text-red-500 transition-colors" title="Add to favorites">
                         <i data-lucide="heart" class="w-4 h-4 fav-icon" data-tool="unit-converter"></i>
                     </button>
-                    <a href="unit-converter.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <a href="unit-converter.html" class="flex flex-col h-full bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                             <i data-lucide="arrow-left-right" class="w-6 h-6"></i>
                         </div>
                         <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Unit Converter</h3>
                         <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
-                            Instantly convert currencies (PHP to USD), length, weight, and temperature measurements with live rates.
+                            Instantly convert currencies, length, weight, and temperature with live market rates.
                         </p>
-                        <div class="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300">
-                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        <div class="flex items-center text-sm font-bold text-blue-600 dark:text-blue-400">
+                            Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"></i>
                         </div>
                     </a>
                 </div>
@@ -114,26 +142,22 @@
 
         <!-- FAVORITES TAB -->
         <div id="tab-favorites" class="tab-content">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Your Favorites</h2>
-                <p class="text-slate-500 dark:text-slate-400 mt-2">Tools you've marked for quick access.</p>
+            <div class="mb-8 md:mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Your Favorites</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 md:mt-2 text-sm md:text-base">Tools you've marked for quick access.</p>
             </div>
-            <div id="favorites-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="favorites-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <!-- Favorites mirrored via JS -->
-                <div class="col-span-full py-20 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-                    <i data-lucide="heart" class="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-4"></i>
-                    <p class="text-slate-400 dark:text-slate-500">No favorites yet. Heart a tool to see it here!</p>
-                </div>
             </div>
         </div>
 
         <!-- SETTINGS TAB -->
         <div id="tab-settings" class="tab-content">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Settings</h2>
-                <p class="text-slate-500 dark:text-slate-400 mt-2">Manage your Tawing Tools preferences.</p>
+            <div class="mb-8 md:mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Settings</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1 md:mt-2 text-sm md:text-base">Manage your Tawing Tools preferences.</p>
             </div>
-            <div class="max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 space-y-8">
+            <div class="max-w-2xl bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 space-y-8">
                 <div class="flex items-center justify-between">
                     <div>
                         <h4 class="font-bold text-slate-900 dark:text-white">Dark Mode</h4>
@@ -155,9 +179,9 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 mt-auto">
-        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500 dark:text-slate-400 gap-4">
+    <!-- Footer (Desktop Only) -->
+    <footer class="hidden md:block border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
             <p>&copy; 2026 Tawing Tools. All rights reserved.</p>
             <div class="flex gap-4">
                 <a href="#" class="hover:text-slate-800 dark:hover:text-white transition-colors">Privacy</a>
@@ -169,13 +193,30 @@
     <script>
         // --- Tab Logic ---
         function switchTab(tabName) {
+            // Content
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            
             document.getElementById('tab-' + tabName).classList.add('active');
-            document.getElementById('nav-' + tabName).classList.add('active');
+            
+            // Desktop Nav
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const desktopLink = document.getElementById('nav-' + tabName);
+            if(desktopLink) desktopLink.classList.add('active');
+
+            // Mobile Nav
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.classList.remove('active');
+                link.classList.add('text-slate-400');
+            });
+            const mobileLink = document.getElementById('mob-nav-' + tabName);
+            if(mobileLink) {
+                mobileLink.classList.add('active');
+                mobileLink.classList.remove('text-slate-400');
+            }
             
             if (tabName === 'favorites') renderFavorites();
+
+            // Scroll to top on switch for mobile
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // --- Dark Mode Logic ---
@@ -192,7 +233,6 @@
             }
         }
 
-        // Load theme on startup
         const savedTheme = localStorage.getItem('tawing_theme');
         if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -211,6 +251,7 @@
             }
             localStorage.setItem('tawing_favorites', JSON.stringify(favorites));
             updateHeartIcons();
+            if (document.getElementById('tab-favorites').classList.contains('active')) renderFavorites();
         }
 
         function updateHeartIcons() {
@@ -218,10 +259,10 @@
                 const toolId = icon.getAttribute('data-tool');
                 if (favorites.includes(toolId)) {
                     icon.classList.add('text-red-500', 'fill-red-500');
-                    icon.classList.remove('text-slate-300', 'dark:text-slate-800');
+                    icon.classList.remove('text-slate-300');
                 } else {
                     icon.classList.remove('text-red-500', 'fill-red-500');
-                    icon.classList.add('text-slate-300', 'dark:text-slate-800');
+                    icon.classList.add('text-slate-300');
                 }
             });
         }
@@ -230,9 +271,7 @@
             const grid = document.getElementById('favorites-grid');
             const favTools = Array.from(document.querySelectorAll('#tab-apps .group')).filter(card => {
                 const iconEl = card.querySelector('.fav-icon');
-                if (!iconEl) return false;
-                const toolId = iconEl.getAttribute('data-tool');
-                return favorites.includes(toolId);
+                return iconEl && favorites.includes(iconEl.getAttribute('data-tool'));
             });
 
             if (favTools.length > 0) {
