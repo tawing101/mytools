@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter | Tawing Tools</title>
+    <!-- Tailwind CSS with Dark Mode Class Strategy -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .category-tab.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        .category-content { display: none; }
+        .category-content.active { display: block; }
+        
+        /* Input styling */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+
+        .loader {
+            border-top-color: #2563eb;
+            animation: spinner 0.6s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans selection:bg-blue-200 min-h-screen">
+    
+    <div class="max-w-4xl mx-auto p-6 md:p-12">
+        
+        <!-- Header -->
+        <header class="mb-10">
+            <a href="index.html" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-600 transition-colors mb-6">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Unit Converter</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-2">Instant conversions with real-time global exchange rates.</p>
+        </header>
+
+        <!-- Category Selector -->
+        <div class="flex flex-wrap gap-2 mb-8 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <button onclick="switchCategory('currency')" id="tab-currency" class="category-tab active px-4 py-2 rounded-xl text-sm font-bold border border-transparent transition-all flex items-center gap-2">
+                <i data-lucide="banknote" class="w-4 h-4"></i> Currency
+            </button>
+            <button onclick="switchCategory('length')" id="tab-length" class="category-tab px-4 py-2 rounded-xl text-sm font-bold border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+                <i data-lucide="ruler" class="w-4 h-4"></i> Length
+            </button>
+            <button onclick="switchCategory('weight')" id="tab-weight" class="category-tab px-4 py-2 rounded-xl text-sm font-bold border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+                <i data-lucide="weight" class="w-4 h-4"></i> Weight
+            </button>
+            <button onclick="switchCategory('temp')" id="tab-temp" class="category-tab px-4 py-2 rounded-xl text-sm font-bold border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center gap-2">
+                <i data-lucide="thermometer" class="w-4 h-4"></i> Temp
+            </button>
+        </div>
+
+        <!-- Conversion Cards -->
+        <div class="space-y-6">
+            
+            <!-- CURRENCY CONTENT -->
+            <div id="content-currency" class="category-content active space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- From -->
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">From</label>
+                            <select id="cur-from-select" onchange="performCurrencyConversion()" class="bg-transparent text-xs font-bold text-blue-600 outline-none">
+                                <option value="USD">USD - Dollar</option>
+                                <option value="PHP" selected>PHP - Peso</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="JPY">JPY - Yen</option>
+                                <option value="GBP">GBP - Pound</option>
+                                <option value="SGD">SGD - Dollar</option>
+                                <option value="AUD">AUD - Dollar</option>
+                                <option value="CAD">CAD - Dollar</option>
+                                <option value="KRW">KRW - Won</option>
+                            </select>
+                        </div>
+                        <input type="number" id="cur-from-val" value="100" oninput="performCurrencyConversion()" class="w-full bg-transparent text-3xl font-light outline-none text-slate-800 dark:text-white" />
+                    </div>
+                    <!-- To -->
+                    <div class="bg-blue-600 p-6 rounded-3xl shadow-lg shadow-blue-500/20 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="text-[10px] font-bold text-blue-200 uppercase tracking-widest">To</label>
+                            <select id="cur-to-select" onchange="performCurrencyConversion()" class="bg-transparent text-xs font-bold text-white outline-none">
+                                <option value="USD" selected>USD - Dollar</option>
+                                <option value="PHP">PHP - Peso</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="JPY">JPY - Yen</option>
+                                <option value="GBP">GBP - Pound</option>
+                                <option value="SGD">SGD - Dollar</option>
+                                <option value="AUD">AUD - Dollar</option>
+                                <option value="CAD">CAD - Dollar</option>
+                                <option value="KRW">KRW - Won</option>
+                            </select>
+                        </div>
+                        <input type="number" id="cur-to-val" readonly class="w-full bg-transparent text-3xl font-light outline-none text-white" />
+                    </div>
+                </div>
+                
+                <div id="rate-status" class="flex items-center justify-center gap-2 py-2">
+                    <div id="rate-loader" class="loader w-3 h-3 border-2 border-slate-200 rounded-full hidden"></div>
+                    <p id="rate-text" class="text-[10px] text-slate-400 italic text-center px-2 tracking-tight">Initializing rates...</p>
+                    <button onclick="fetchLiveRates()" id="refreshBtn" class="text-blue-500 hover:text-blue-600 p-1 rounded-lg transition-colors" title="Refresh Rates">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LENGTH CONTENT -->
+            <div id="content-length" class="category-content space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Meters (m)</label>
+                        <input type="number" id="len-m" value="1" oninput="convertLength('m')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Feet (ft)</label>
+                        <input type="number" id="len-ft" oninput="convertLength('ft')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Inches (in)</label>
+                        <input type="number" id="len-in" oninput="convertLength('in')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- WEIGHT CONTENT -->
+            <div id="content-weight" class="category-content space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kilograms (kg)</label>
+                        <input type="number" id="wei-kg" value="1" oninput="convertWeight('kg')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pounds (lb)</label>
+                        <input type="number" id="wei-lb" oninput="convertWeight('lb')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Grams (g)</label>
+                        <input type="number" id="wei-g" oninput="convertWeight('g')" class="w-full bg-transparent text-2xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMP CONTENT -->
+            <div id="content-temp" class="category-content space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Celsius (°C)</label>
+                        <input type="number" id="tmp-c" value="0" oninput="convertTemp('c')" class="w-full bg-transparent text-3xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 text-center">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fahrenheit (°F)</label>
+                        <input type="number" id="tmp-f" oninput="convertTemp('f')" class="w-full bg-transparent text-3xl font-light outline-none text-slate-800 dark:text-white text-center" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // --- Configuration & State ---
+        const apiKey = ""; 
+        let exchangeRates = {
+            "USD": 1,
+            "PHP": 56.50 // Fallback
+        };
+        let isRatesLoading = false;
+
+        // --- Initialization ---
+        lucide.createIcons();
+        
+        if (localStorage.getItem('tawing_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // --- Live Rates Logic ---
+        async function fetchLiveRates(retryCount = 0) {
+            const statusText = document.getElementById('rate-text');
+            const loader = document.getElementById('rate-loader');
+            const refreshBtn = document.getElementById('refreshBtn');
+            
+            if (isRatesLoading) return;
+
+            isRatesLoading = true;
+            loader.classList.remove('hidden');
+            refreshBtn.classList.add('animate-spin', 'pointer-events-none');
+            statusText.textContent = retryCount > 0 ? `Retrying (${retryCount}/5)...` : "Getting live rates...";
+
+            // Refined prompt for Search Grounding
+            const userQuery = "Get the latest mid-market foreign exchange rates relative to 1 USD for: PHP, EUR, JPY, GBP, SGD, AUD, CAD, KRW. Provide ONLY a JSON object with currency codes as keys and numbers as values.";
+            const systemPrompt = "Return only raw JSON. Ensure numbers are accurate based on current search results.";
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        tools: [{ "google_search": {} }], // MANDATORY for live accuracy
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (!response.ok) throw new Error();
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (text) {
+                    const parsedRates = JSON.parse(text);
+                    exchangeRates = { "USD": 1, ...parsedRates };
+                    statusText.textContent = `Live rates active • ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    statusText.classList.remove('text-red-400');
+                    performCurrencyConversion();
+                }
+            } catch (error) {
+                if (retryCount < 5) {
+                    const delay = Math.pow(2, retryCount) * 1000;
+                    setTimeout(() => fetchLiveRates(retryCount + 1), delay);
+                } else {
+                    statusText.textContent = "Rate sync failed. Using last known data.";
+                    statusText.classList.add('text-red-400');
+                }
+            } finally {
+                loader.classList.add('hidden');
+                refreshBtn.classList.remove('animate-spin', 'pointer-events-none');
+                isRatesLoading = false;
+            }
+        }
+
+        // --- UI Logic ---
+        function switchCategory(cat) {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
+            
+            document.getElementById('tab-' + cat).classList.add('active');
+            document.getElementById('content-' + cat).classList.add('active');
+            
+            if (cat === 'currency') performCurrencyConversion();
+        }
+
+        function performCurrencyConversion() {
+            const fromCode = document.getElementById('cur-from-select').value;
+            const toCode = document.getElementById('cur-to-select').value;
+            const fromVal = parseFloat(document.getElementById('cur-from-val').value) || 0;
+            const toInput = document.getElementById('cur-to-val');
+
+            if (!exchangeRates[fromCode] || !exchangeRates[toCode]) return;
+
+            const result = (fromVal / exchangeRates[fromCode]) * exchangeRates[toCode];
+            toInput.value = result.toFixed(2);
+        }
+
+        // measurement conversions
+        function convertLength(source) {
+            const m = document.getElementById('len-m');
+            const ft = document.getElementById('len-ft');
+            const inch = document.getElementById('len-in');
+            let val = parseFloat(document.getElementById('len-' + source).value) || 0;
+            let baseM;
+            if (source === 'm') baseM = val;
+            if (source === 'ft') baseM = val / 3.28084;
+            if (source === 'in') baseM = val / 39.3701;
+            if (source !== 'm') m.value = parseFloat(baseM.toFixed(4));
+            if (source !== 'ft') ft.value = parseFloat((baseM * 3.28084).toFixed(4));
+            if (source !== 'in') inch.value = parseFloat((baseM * 39.3701).toFixed(4));
+        }
+
+        function convertWeight(source) {
+            const kg = document.getElementById('wei-kg');
+            const lb = document.getElementById('wei-lb');
+            const g = document.getElementById('wei-g');
+            let val = parseFloat(document.getElementById('wei-' + source).value) || 0;
+            let baseKg;
+            if (source === 'kg') baseKg = val;
+            if (source === 'lb') baseKg = val / 2.20462;
+            if (source === 'g') baseKg = val / 1000;
+            if (source !== 'kg') kg.value = parseFloat(baseKg.toFixed(4));
+            if (source !== 'lb') lb.value = parseFloat((baseKg * 2.20462).toFixed(4));
+            if (source !== 'g') g.value = parseFloat((baseKg * 1000).toFixed(4));
+        }
+
+        function convertTemp(source) {
+            const c = document.getElementById('tmp-c');
+            const f = document.getElementById('tmp-f');
+            let val = parseFloat(document.getElementById('tmp-' + source).value) || 0;
+            if (source === 'c') f.value = parseFloat(((val * 9/5) + 32).toFixed(2));
+            else c.value = parseFloat(((val - 32) * 5/9).toFixed(2));
+        }
+
+        window.onload = () => {
+            fetchLiveRates();
+        };
+    </script>
+</body>
+</html>
