@@ -652,52 +652,52 @@ html, body {
     <!-- SCREEN: TIDE -->
     <div class="screen" id="screen-tide">
       <div class="card">
-        <div class="card-label">Current Tide Level</div>
-        <div class="tide-visual" id="tideVisual">
-          <div class="tide-fill-visual" id="tideFill" style="height:50%">
-            <div class="tide-wave-line"></div>
+        <div class="card-label">Live Tide Times — General Luna</div>
+        <div style="font-size:13px; color:var(--cream); line-height:1.6; margin-bottom:14px;">
+          Accurate tide predictions need a proper tidal station model. Rather than estimate, this opens professional tide tables for General Luna — the same sources surfers and boat operators rely on.
+        </div>
+        <a href="https://www.tide-forecast.com/locations/General-Luna/tides/latest" target="_blank" style="display:block; background:linear-gradient(135deg, rgba(26,107,138,0.6), rgba(13,59,94,0.6)); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; text-decoration:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:14px; font-weight:600; color:var(--cream);">🌊 Tide-Forecast.com</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">7-day tide chart · High/low times & heights</div>
+            </div>
+            <div style="font-size:18px; color:var(--foam);">→</div>
           </div>
-          <div class="tide-pct-label" id="tidePct">50%</div>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px;">
-          <span>LOW</span>
-          <span id="tideDirection" style="color:var(--foam); font-weight:600;">INCOMING</span>
-          <span>HIGH</span>
-        </div>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-box">
-          <div class="stat-val" id="tide-high-time">--:--</div>
-          <div class="stat-unit">High Tide</div>
-          <div class="stat-label" id="tide-high-h">-- m</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="tide-low-time">--:--</div>
-          <div class="stat-unit">Low Tide</div>
-          <div class="stat-label" id="tide-low-h">-- m</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="tide-wave">--</div>
-          <div class="stat-unit">m</div>
-          <div class="stat-label">Wave Ht.</div>
-        </div>
+        </a>
+        <a href="https://www.surfline.com/tide-charts/cloud-9/5842041f4e65fad6a7708d7a" target="_blank" style="display:block; background:linear-gradient(135deg, rgba(26,107,138,0.6), rgba(13,59,94,0.6)); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; text-decoration:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:14px; font-weight:600; color:var(--cream);">🏄 Surfline — Cloud 9 Tides</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">Port Pilar station · Surfer standard</div>
+            </div>
+            <div style="font-size:18px; color:var(--foam);">→</div>
+          </div>
+        </a>
+        <a href="https://tides4fishing.com/ph/philippines/port-pilar-siargao-island" target="_blank" style="display:block; background:linear-gradient(135deg, rgba(26,107,138,0.6), rgba(13,59,94,0.6)); border:1px solid var(--border); border-radius:12px; padding:14px 16px; text-decoration:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:14px; font-weight:600; color:var(--cream);">🎣 Tides4Fishing — Port Pilar</div>
+              <div style="font-size:11px; color:var(--muted); margin-top:2px;">Tide + solunar fishing times</div>
+            </div>
+            <div style="font-size:18px; color:var(--foam);">→</div>
+          </div>
+        </a>
       </div>
 
       <div class="card">
-        <div class="card-label">Best Windows Today</div>
-        <div class="price-item">
-          <div><div style="color:var(--good); font-weight:600; font-size:13px;">🏄 Surfing</div><div class="price-label">Cloud 9 / Tuason Point</div></div>
-          <div style="text-align:right;"><div class="activity-window" id="tw-surf">--</div></div>
+        <div class="card-label">Sunrise & Sunset Today</div>
+        <div class="stat-row stat-row-2">
+          <div class="stat-box">
+            <div class="stat-val" id="tide-sunrise">--</div>
+            <div class="stat-label">Sunrise</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="tide-sunset">--</div>
+            <div class="stat-label">Sunset</div>
+          </div>
         </div>
-        <div class="price-item">
-          <div><div style="color:var(--foam); font-weight:600; font-size:13px;">🤿 Snorkeling</div><div class="price-label">Coral Garden / Sohoton</div></div>
-          <div style="text-align:right;"><div class="activity-window" id="tw-snorkel">--</div></div>
-        </div>
-        <div class="price-item">
-          <div><div style="color:var(--sand); font-weight:600; font-size:13px;">⛵ Island Hop</div><div class="price-label">Naked / Daku / Guyam</div></div>
-          <div style="text-align:right;"><div class="activity-window" id="tw-islandhop">--</div></div>
-        </div>
+        <div style="font-size:11px; color:var(--good); margin-top:8px; text-align:center;">✓ Live from weather data</div>
       </div>
 
       <div class="card">
@@ -706,6 +706,8 @@ html, body {
           Siargao has a semi-diurnal tide pattern — two high and two low tides per day.
           Cloud 9 breaks best on mid-to-high incoming tide with offshore (NE) winds.
           Island hopping is safest when wave height is below 1m.
+          <br><br>
+          <span style="color:var(--sand);">For boat trips, diving, or fishing, always use the official tide tables above — never rely on an estimate.</span>
         </div>
       </div>
       <div class="safe-bottom"></div>
@@ -728,6 +730,9 @@ html, body {
             <div style="font-size:11px; color:var(--muted); margin-top:6px;" id="condSummary">Fetching conditions...</div>
           </div>
         </div>
+        <div style="font-size:10px; color:var(--sand); margin-top:10px; line-height:1.4;">
+          ⚠️ Score is a guide based on live wave & wind data — not a tide-aware forecast. For Cloud 9 timing, check the Tide tab's pro sources or look at the break yourself.
+        </div>
       </div>
 
       <div class="activity-card">
@@ -738,7 +743,7 @@ html, body {
         </div>
         <div class="activity-time">
           <div class="activity-window" id="act-surf">--</div>
-          <div class="activity-tag">Best window</div>
+          <div class="activity-tag">Live conditions</div>
         </div>
       </div>
 
@@ -750,7 +755,7 @@ html, body {
         </div>
         <div class="activity-time">
           <div class="activity-window" id="act-islandhop">--</div>
-          <div class="activity-tag">Best window</div>
+          <div class="activity-tag">Live conditions</div>
         </div>
       </div>
 
@@ -762,7 +767,7 @@ html, body {
         </div>
         <div class="activity-time">
           <div class="activity-window" id="act-snorkel">--</div>
-          <div class="activity-tag">Best window</div>
+          <div class="activity-tag">Live conditions</div>
         </div>
       </div>
 
@@ -774,7 +779,7 @@ html, body {
         </div>
         <div class="activity-time">
           <div class="activity-window" id="act-lagoon">--</div>
-          <div class="activity-tag">Best window</div>
+          <div class="activity-tag">Live conditions</div>
         </div>
       </div>
 
@@ -951,7 +956,7 @@ html, body {
     <div class="screen" id="screen-forecast">
       <div class="card">
         <div class="card-label">7-Day Surf Outlook</div>
-        <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Daily max wave height & best surf rating · Cloud 9 area</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Wave height & direction are live forecast data from Open-Meteo. The surf rating is a guide derived from that data — not a tide-aware pro forecast.</div>
         <div id="surfForecastList">
           <div class="loading-state" style="padding:20px">
             <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
@@ -962,6 +967,7 @@ html, body {
 
       <div class="card">
         <div class="card-label">Wave Height Trend</div>
+        <div style="font-size:11px; color:var(--good); margin-bottom:8px;">✓ Live forecast data</div>
         <div id="waveChart" style="padding-top:8px;">
           <div class="loading-state" style="padding:14px">
             <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
@@ -1144,42 +1150,16 @@ function renderOcean() {
 }
 
 // ============================================================
-// RENDER TIDE
+// RENDER TIDE (honest — live sunrise/sunset only, links for tides)
 // ============================================================
 function renderTide() {
-  const now = new Date();
-  const phNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-  const hour = phNow.getHours() + phNow.getMinutes() / 60;
-
-  const cycle = 12.42;
-  const phase = (hour % cycle) / cycle;
-  const pct = Math.round(50 + 50 * Math.sin(phase * 2 * Math.PI));
-
-  document.getElementById('tideFill').style.height = pct + '%';
-  document.getElementById('tidePct').textContent = pct + '%';
-  document.getElementById('tideDirection').textContent = pct > 50 ? '↑ INCOMING' : '↓ OUTGOING';
-
-  // High / low times
-  const hoursToHigh = cycle * (1 - phase);
-  const highH = (hour + hoursToHigh) % 24;
-  const lowH  = (highH + cycle / 2) % 24;
-
-  document.getElementById('tide-high-time').textContent = formatHour(highH);
-  document.getElementById('tide-low-time').textContent  = formatHour(lowH);
-
-  const wh = marineData ? marineData.current.wave_height : 0;
-  document.getElementById('tide-high-h').textContent = (1.2 + wh * 0.3).toFixed(1) + ' m est.';
-  document.getElementById('tide-low-h').textContent  = '0.2 m est.';
-  document.getElementById('tide-wave').textContent   = marineData ? marineData.current.wave_height.toFixed(1) : '--';
-
-  // Best windows
-  const surfWindow = hour < 7 ? '6–10 AM' : hour < 11 ? 'Now – 12PM' : '6AM Tomorrow';
-  const snorkWindow = pct < 35 ? 'Now (Low Tide)' : formatHour(lowH);
-  const hopWindow = (wh < 1.0 && (weatherData?.current?.windspeed_10m || 99) < 20) ? 'Anytime today' : hour < 10 ? '9AM – 12PM' : 'Tomorrow AM';
-
-  document.getElementById('tw-surf').textContent     = surfWindow;
-  document.getElementById('tw-snorkel').textContent  = snorkWindow;
-  document.getElementById('tw-islandhop').textContent = hopWindow;
+  // Only show data we can actually verify: sunrise/sunset from weather API
+  if (weatherData?.daily?.sunrise?.[0]) {
+    const sr = weatherData.daily.sunrise[0].split('T')[1]?.slice(0,5) || '--';
+    const ss = weatherData.daily.sunset[0].split('T')[1]?.slice(0,5) || '--';
+    document.getElementById('tide-sunrise').textContent = formatTime(sr);
+    document.getElementById('tide-sunset').textContent  = formatTime(ss);
+  }
 }
 
 // ============================================================
@@ -1232,19 +1212,18 @@ function renderActivities() {
   document.getElementById('condSummary').textContent =
     `${wh.toFixed(1)}m waves · ${Math.round(ws)}km/h wind · ${Math.round(rp)}% rain · Direction: ${directionName(wd)}`;
 
-  // Windows
-  const phNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-  const hour = phNow.getHours();
+  // Activity guidance — based on LIVE wave/wind only, not fabricated time windows.
+  // We describe whether current conditions suit each activity, and defer tide timing to the Tide tab's pro sources.
+  const surfMsg = (wh >= 1.0 && wh <= 2.5 && wd >= 45 && wd <= 120)
+    ? 'Good now' : (wh < 0.5) ? 'Too small' : (wh > 2.5) ? 'Big — experts' : 'Marginal';
+  const hopMsg = (wh < 1.0 && ws < 20) ? 'Safe now' : (wh > 1.5 || ws > 30) ? 'Rough — caution' : 'Check first';
+  const snorkMsg = (wh < 0.8 && ws < 15) ? 'Calm now' : 'Choppy';
+  const lagoonMsg = (wh < 0.8 && ws < 15) ? 'Calm now' : 'Check conditions';
 
-  const surfWindow  = hour < 7 ? '6–10 AM' : hour < 11 ? 'Now – 12PM' : '6AM Tomorrow';
-  const hopWindow   = (wh < 1.0 && ws < 20) ? 'Anytime today' : hour < 10 ? '9AM – 12PM' : 'Tomorrow AM';
-  const snorkWindow = hour < 10 ? '7AM – 11AM' : hour < 14 ? 'Now (check tide)' : 'Tomorrow AM';
-  const lagoonWindow = (wh < 0.8 && ws < 15) ? '8AM – 3PM' : 'Check conditions';
-
-  document.getElementById('act-surf').textContent      = surfWindow;
-  document.getElementById('act-islandhop').textContent = hopWindow;
-  document.getElementById('act-snorkel').textContent   = snorkWindow;
-  document.getElementById('act-lagoon').textContent    = lagoonWindow;
+  document.getElementById('act-surf').textContent      = surfMsg;
+  document.getElementById('act-islandhop').textContent = hopMsg;
+  document.getElementById('act-snorkel').textContent   = snorkMsg;
+  document.getElementById('act-lagoon').textContent    = lagoonMsg;
 
   // Conditions detail
   document.getElementById('cond-wave').textContent = `${wh.toFixed(1)}m`;
