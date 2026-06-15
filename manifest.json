@@ -2,7 +2,7 @@
   "name": "Siargao Island Station",
   "short_name": "Siargao",
   "description": "Live surf, weather, tide & island info for Siargao Island",
-  "start_url": "siargao-island-station.html",
+  "start_url": "siargaostation.html",
   "scope": ".",
   "display": "standalone",
   "orientation": "portrait",
