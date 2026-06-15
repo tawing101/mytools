@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#050f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Live surf, weather, tide & island info for Siargao Island">
+<link rel="apple-touch-icon" href="icon-apple-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<title>Siargao Island Station</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #050f1a;
+  --ocean-mid:  #0a1f35;
+  --ocean-surf: #0d3b5e;
+  --wave:       #1a6b8a;
+  --foam:       #4db8d4;
+  --sand:       #c8a96e;
+  --coral:      #e8734a;
+  --palm:       #4a7c59;
+  --sun:        #f5c842;
+  --cream:      #f0ead8;
+  --white:      #ffffff;
+  --muted:      #5a7a8a;
+  --border:     rgba(77,184,212,0.15);
+  --card:       rgba(10,31,53,0.8);
+  --good:       #2ecc71;
+  --fair:       #f39c12;
+  --poor:       #e74c3c;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--ocean-deep);
+  font-family: 'Outfit', sans-serif;
+  color: var(--cream);
+  user-select: none;
+}
+
+/* ANIMATED OCEAN BACKGROUND */
+.ocean-bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: linear-gradient(180deg, #020810 0%, #050f1a 40%, #0a1f35 100%);
+  overflow: hidden;
+}
+.wave-layer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 120px;
+  opacity: 0.12;
+}
+.wave-layer svg { width: 200%; animation: waveMove 8s linear infinite; }
+.wave-layer:nth-child(2) svg { animation-duration: 12s; animation-direction: reverse; opacity: 0.7; }
+.wave-layer:nth-child(3) svg { animation-duration: 6s; opacity: 0.5; }
+@keyframes waveMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* STARS */
+.stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 8%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 5%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 12%, rgba(255,255,255,0.3) 0%, transparent 100%);
+}
+
+/* APP SHELL */
+.app { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; }
+
+/* STATUS BAR SPACE */
+.status-bar { height: env(safe-area-inset-top, 0px); }
+
+/* HEADER */
+.header {
+  padding: 12px 20px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(5,15,26,0.7);
+  backdrop-filter: blur(20px);
+  flex-shrink: 0;
+}
+.header-brand { display: flex; align-items: center; gap: 10px; }
+.header-wave-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--foam), var(--wave));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.header-title {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  color: var(--foam);
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+.header-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.header-time {
+  text-align: right;
+}
+.header-clock {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  color: var(--cream);
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+.header-ampm { font-size: 10px; color: var(--muted); }
+.header-date { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+/* NAV */
+.nav {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: rgba(5,15,26,0.6);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav-item {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.nav-item.active { color: var(--foam); border-bottom-color: var(--foam); }
+
+/* SCREENS */
+.screens { flex: 1; overflow: hidden; position: relative; }
+.screen {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: none;
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { display: block; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  backdrop-filter: blur(10px);
+}
+.card-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* HERO STAT */
+.hero-stat {
+  background: linear-gradient(135deg, var(--ocean-surf) 0%, var(--ocean-mid) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-stat::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(77,184,212,0.08);
+}
+.hero-main {
+  font-family: 'Fraunces', serif;
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--white);
+  letter-spacing: -2px;
+}
+.hero-unit { font-size: 20px; color: var(--foam); vertical-align: super; }
+.hero-label { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.hero-desc { font-size: 14px; color: var(--sand); margin-top: 6px; }
+
+/* STAT ROW */
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.stat-row-2 { grid-template-columns: repeat(2, 1fr); }
+.stat-row-4 { grid-template-columns: repeat(4, 1fr); }
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+.stat-val {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--white);
+  line-height: 1;
+}
+.stat-unit { font-size: 11px; color: var(--muted); }
+.stat-label { font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+/* SURF SCORE */
+.surf-score-ring {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.surf-score-val {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+}
+.surf-score-label { font-size: 9px; letter-spacing: 1px; }
+
+/* QUALITY BADGE */
+.quality-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.quality-perfect { background: rgba(46,204,113,0.2); color: var(--good); border: 1px solid rgba(46,204,113,0.3); }
+.quality-good    { background: rgba(77,184,212,0.2); color: var(--foam); border: 1px solid rgba(77,184,212,0.3); }
+.quality-fair    { background: rgba(243,156,18,0.2); color: var(--fair); border: 1px solid rgba(243,156,18,0.3); }
+.quality-poor    { background: rgba(231,76,60,0.2);  color: var(--poor); border: 1px solid rgba(231,76,60,0.3); }
+
+/* PROGRESS BAR */
+.progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* TIDE VISUAL */
+.tide-visual {
+  height: 80px;
+  background: linear-gradient(180deg, rgba(13,59,94,0.3) 0%, rgba(26,107,138,0.5) 100%);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.tide-fill-visual {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(180deg, rgba(77,184,212,0.4) 0%, rgba(26,107,138,0.7) 100%);
+  transition: height 2s ease;
+  border-radius: 0 0 11px 11px;
+}
+.tide-wave-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 8px;
+  background: linear-gradient(90deg, transparent, rgba(77,184,212,0.6), transparent);
+  animation: tidePulse 3s ease-in-out infinite;
+}
+@keyframes tidePulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+.tide-pct-label {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--white);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* ACTIVITY CARDS */
+.activity-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.activity-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.activity-info { flex: 1; }
+.activity-name { font-size: 14px; font-weight: 600; color: var(--cream); }
+.activity-spot { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.activity-time { text-align: right; }
+.activity-window { font-size: 13px; font-weight: 600; color: var(--foam); }
+.activity-tag { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ALERT BANNER */
+.alert-banner {
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.alert-banner.clear  { background: rgba(46,204,113,0.1);  border: 1px solid rgba(46,204,113,0.25); }
+.alert-banner.warn   { background: rgba(243,156,18,0.1);  border: 1px solid rgba(243,156,18,0.25); }
+.alert-banner.danger { background: rgba(231,76,60,0.1);   border: 1px solid rgba(231,76,60,0.3); }
+.alert-icon { font-size: 28px; flex-shrink: 0; }
+.alert-title { font-size: 14px; font-weight: 700; }
+.alert-title.clear  { color: var(--good); }
+.alert-title.warn   { color: var(--fair); }
+.alert-title.danger { color: var(--poor); }
+.alert-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+/* EMERGENCY ITEMS */
+.emergency-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.emergency-item:last-child { border-bottom: none; }
+.emergency-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--poor);
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--poor);
+}
+.emergency-name { font-size: 12px; color: var(--muted); }
+.emergency-num { font-size: 15px; font-weight: 600; color: var(--cream); margin-top: 2px; }
+.call-btn {
+  margin-left: auto;
+  background: rgba(231,76,60,0.15);
+  border: 1px solid rgba(231,76,60,0.3);
+  color: var(--poor);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* PRICE ITEMS */
+.price-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.price-item:last-child { border-bottom: none; }
+.price-label { font-size: 13px; color: var(--muted); }
+.price-val { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: var(--cream); }
+.price-unit { font-size: 11px; color: var(--muted); }
+
+/* FERRY */
+.ferry-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.ferry-chip {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--muted);
+  transition: all 0.3s;
+}
+.ferry-chip.next {
+  background: rgba(46,204,113,0.15);
+  border-color: rgba(46,204,113,0.4);
+  color: var(--good);
+  position: relative;
+}
+.ferry-chip.next::after {
+  content: 'NEXT';
+  position: absolute;
+  top: -8px; right: -4px;
+  background: var(--good);
+  color: var(--ocean-deep);
+  font-size: 8px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.ferry-chip.passed { opacity: 0.35; }
+
+/* FORECAST ROW */
+.forecast-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.forecast-row:last-child { border-bottom: none; }
+.forecast-day { font-size: 13px; color: var(--muted); width: 36px; flex-shrink: 0; }
+.forecast-icon { font-size: 20px; width: 28px; flex-shrink: 0; }
+.forecast-desc { font-size: 12px; color: var(--muted); flex: 1; }
+.forecast-temp { font-size: 13px; font-weight: 600; color: var(--cream); white-space: nowrap; }
+.forecast-rain { font-size: 11px; color: var(--foam); }
+
+/* LOADING */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 40px 20px; gap: 12px;
+}
+.loading-wave {
+  display: flex; gap: 4px; align-items: flex-end; height: 24px;
+}
+.loading-wave span {
+  width: 4px; border-radius: 2px;
+  background: var(--foam);
+  animation: loadWave 1.2s ease-in-out infinite;
+}
+.loading-wave span:nth-child(2) { animation-delay: 0.1s; }
+.loading-wave span:nth-child(3) { animation-delay: 0.2s; }
+.loading-wave span:nth-child(4) { animation-delay: 0.3s; }
+.loading-wave span:nth-child(5) { animation-delay: 0.4s; }
+@keyframes loadWave {
+  0%,100% { height: 4px; opacity: 0.3; }
+  50% { height: 20px; opacity: 1; }
+}
+.loading-text { font-size: 13px; color: var(--muted); }
+
+/* REFRESH BTN */
+.refresh-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(77,184,212,0.1);
+  border: 1px solid rgba(77,184,212,0.25);
+  border-radius: 12px;
+  color: var(--foam);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.refresh-btn:active { background: rgba(77,184,212,0.2); transform: scale(0.98); }
+
+/* INSTALL BANNER */
+.install-banner {
+  background: linear-gradient(135deg, rgba(26,107,138,0.6), rgba(13,59,94,0.6));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+  display: none;
+}
+.install-banner.show { display: flex; }
+.install-text { flex: 1; font-size: 13px; color: var(--cream); line-height: 1.4; }
+.install-btn {
+  background: var(--foam);
+  color: var(--ocean-deep);
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(10,31,53,0.95);
+  border: 1px solid var(--border);
+  color: var(--cream);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 999;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+  backdrop-filter: blur(20px);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* TYPHOON ALERT OVERLAY */
+.typhoon-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(231,76,60,0.15);
+  border: 3px solid rgba(231,76,60,0.6);
+  pointer-events: none;
+  display: none;
+  animation: typhoonPulse 2s ease-in-out infinite;
+}
+.typhoon-overlay.active { display: block; }
+@keyframes typhoonPulse { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* WIND DIRECTION */
+.wind-arrow {
+  display: inline-block;
+  font-size: 18px;
+  transition: transform 0.5s ease;
+}
+
+/* OFFLINE BADGE */
+.offline-badge {
+  display: none;
+  background: rgba(243,156,18,0.2);
+  border: 1px solid rgba(243,156,18,0.4);
+  color: var(--fair);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.offline-badge.show { display: inline-block; }
+
+/* SAFE AREA BOTTOM */
+.safe-bottom { height: env(safe-area-inset-bottom, 16px); }
+</style>
+</head>
+<body>
+
+<div class="typhoon-overlay" id="typhoonOverlay"></div>
+
+<div class="ocean-bg">
+  <div class="stars"></div>
+  <div class="wave-layer">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" height="120">
+      <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1350,30 1440,60 L1440,120 L0,120 Z" fill="#1a6b8a"/>
+      <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1350,30 1440,60 L1440,120 L0,120 Z" fill="#1a6b8a" transform="translate(720,0)"/>
+    </svg>
+  </div>
+  <div class="wave-layer">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" height="120">
+      <path d="M0,80 C240,20 480,100 720,60 C960,20 1200,100 1440,60 L1440,120 L0,120 Z" fill="#0d3b5e"/>
+      <path d="M0,80 C240,20 480,100 720,60 C960,20 1200,100 1440,60 L1440,120 L0,120 Z" fill="#0d3b5e" transform="translate(720,0)"/>
+    </svg>
+  </div>
+</div>
+
+<div class="app">
+  <div class="status-bar"></div>
+
+  <div class="header">
+    <div class="header-brand">
+      <div class="header-wave-icon">🌊</div>
+      <div>
+        <div class="header-title">Siargao Island Station</div>
+        <div class="header-sub">General Luna · <span id="h-coords">9.8015°N 126.1115°E</span> <span class="offline-badge" id="offlineBadge">OFFLINE</span></div>
+      </div>
+    </div>
+    <div class="header-time">
+      <div class="header-clock" id="headerClock">--:--</div>
+      <div class="header-ampm" id="headerAmpm">--</div>
+      <div class="header-date" id="headerDate">--</div>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <div class="nav-item active" data-screen="ocean">🌊 Ocean</div>
+    <div class="nav-item" data-screen="tide">🌊 Tide</div>
+    <div class="nav-item" data-screen="activities">🏄 Activities</div>
+    <div class="nav-item" data-screen="alerts">🚨 Alerts</div>
+    <div class="nav-item" data-screen="islandlife">🏝️ Island Life</div>
+    <div class="nav-item" data-screen="forecast">📊 Forecast</div>
+    <div class="nav-item" data-screen="emergency">🆘 Emergency</div>
+  </div>
+
+  <div class="screens">
+
+    <!-- SCREEN: OCEAN & WEATHER -->
+    <div class="screen active" id="screen-ocean">
+      <div class="install-banner" id="installBanner">
+        <div class="install-text">📲 Install as app — tap here to add to your home screen</div>
+        <button class="install-btn" id="installBtn">Install</button>
+      </div>
+
+      <div class="hero-stat" id="ocean-hero">
+        <div class="loading-state">
+          <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="loading-text">Fetching ocean data...</div>
+        </div>
+      </div>
+
+      <div class="stat-row stat-row-4" id="ocean-stats">
+        <div class="stat-box"><div class="stat-val" id="os-wind">--</div><div class="stat-unit">km/h</div><div class="stat-label">Wind</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-humid">--</div><div class="stat-unit">%</div><div class="stat-label">Humid</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-period">--</div><div class="stat-unit">sec</div><div class="stat-label">Period</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-water">--</div><div class="stat-unit">°C</div><div class="stat-label">Water</div></div>
+      </div>
+
+      <div class="stat-row stat-row-4">
+        <div class="stat-box"><div class="stat-val" id="os-uv">--</div><div class="stat-unit"></div><div class="stat-label">UV Index</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-rain">--</div><div class="stat-unit">%</div><div class="stat-label">Rain</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-sunrise">--</div><div class="stat-unit"></div><div class="stat-label">Sunrise</div></div>
+        <div class="stat-box"><div class="stat-val" id="os-sunset">--</div><div class="stat-unit"></div><div class="stat-label">Sunset</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">5-Day Forecast</div>
+        <div id="forecast-list">
+          <div class="loading-state" style="padding:20px">
+            <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="refresh-btn" onclick="refreshAll()">↻ Refresh All Data</button>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: TIDE -->
+    <div class="screen" id="screen-tide">
+      <div class="card">
+        <div class="card-label">Current Tide Level</div>
+        <div class="tide-visual" id="tideVisual">
+          <div class="tide-fill-visual" id="tideFill" style="height:50%">
+            <div class="tide-wave-line"></div>
+          </div>
+          <div class="tide-pct-label" id="tidePct">50%</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px;">
+          <span>LOW</span>
+          <span id="tideDirection" style="color:var(--foam); font-weight:600;">INCOMING</span>
+          <span>HIGH</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val" id="tide-high-time">--:--</div>
+          <div class="stat-unit">High Tide</div>
+          <div class="stat-label" id="tide-high-h">-- m</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="tide-low-time">--:--</div>
+          <div class="stat-unit">Low Tide</div>
+          <div class="stat-label" id="tide-low-h">-- m</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="tide-wave">--</div>
+          <div class="stat-unit">m</div>
+          <div class="stat-label">Wave Ht.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Best Windows Today</div>
+        <div class="price-item">
+          <div><div style="color:var(--good); font-weight:600; font-size:13px;">🏄 Surfing</div><div class="price-label">Cloud 9 / Tuason Point</div></div>
+          <div style="text-align:right;"><div class="activity-window" id="tw-surf">--</div></div>
+        </div>
+        <div class="price-item">
+          <div><div style="color:var(--foam); font-weight:600; font-size:13px;">🤿 Snorkeling</div><div class="price-label">Coral Garden / Sohoton</div></div>
+          <div style="text-align:right;"><div class="activity-window" id="tw-snorkel">--</div></div>
+        </div>
+        <div class="price-item">
+          <div><div style="color:var(--sand); font-weight:600; font-size:13px;">⛵ Island Hop</div><div class="price-label">Naked / Daku / Guyam</div></div>
+          <div style="text-align:right;"><div class="activity-window" id="tw-islandhop">--</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label" style="margin-bottom:6px;">About Siargao Tides</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.6;">
+          Siargao has a semi-diurnal tide pattern — two high and two low tides per day.
+          Cloud 9 breaks best on mid-to-high incoming tide with offshore (NE) winds.
+          Island hopping is safest when wave height is below 1m.
+        </div>
+      </div>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: ACTIVITIES -->
+    <div class="screen" id="screen-activities">
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-label">Surf Conditions Now</div>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div class="surf-score-ring" id="scoreRing">
+            <div class="surf-score-val" id="scoreVal">--</div>
+            <div class="surf-score-label" style="color:var(--muted);">/ 100</div>
+          </div>
+          <div style="flex:1;">
+            <div id="qualityBadge" class="quality-badge quality-fair" style="margin-bottom:8px;">Loading...</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="scoreBar" style="width:0%; background:var(--fair);"></div>
+            </div>
+            <div style="font-size:11px; color:var(--muted); margin-top:6px;" id="condSummary">Fetching conditions...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-card">
+        <div class="activity-icon" style="background:rgba(46,204,113,0.15);">🏄</div>
+        <div class="activity-info">
+          <div class="activity-name">Surfing</div>
+          <div class="activity-spot">Cloud 9 · Tuason Point · Jacking Horse</div>
+        </div>
+        <div class="activity-time">
+          <div class="activity-window" id="act-surf">--</div>
+          <div class="activity-tag">Best window</div>
+        </div>
+      </div>
+
+      <div class="activity-card">
+        <div class="activity-icon" style="background:rgba(77,184,212,0.15);">⛵</div>
+        <div class="activity-info">
+          <div class="activity-name">Island Hopping</div>
+          <div class="activity-spot">Naked Island · Daku · Guyam</div>
+        </div>
+        <div class="activity-time">
+          <div class="activity-window" id="act-islandhop">--</div>
+          <div class="activity-tag">Best window</div>
+        </div>
+      </div>
+
+      <div class="activity-card">
+        <div class="activity-icon" style="background:rgba(200,169,110,0.15);">🤿</div>
+        <div class="activity-info">
+          <div class="activity-name">Snorkeling</div>
+          <div class="activity-spot">Coral Garden · Sohoton Cove</div>
+        </div>
+        <div class="activity-time">
+          <div class="activity-window" id="act-snorkel">--</div>
+          <div class="activity-tag">Best window</div>
+        </div>
+      </div>
+
+      <div class="activity-card">
+        <div class="activity-icon" style="background:rgba(74,124,89,0.15);">🌿</div>
+        <div class="activity-info">
+          <div class="activity-name">Lagoon Visit</div>
+          <div class="activity-spot">Sugba Lagoon · Bucas Grande</div>
+        </div>
+        <div class="activity-time">
+          <div class="activity-window" id="act-lagoon">--</div>
+          <div class="activity-tag">Best window</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Conditions Breakdown</div>
+        <div class="price-item">
+          <div class="price-label">Wave Height</div>
+          <div id="cond-wave" style="font-size:14px; font-weight:600; color:var(--cream);">--</div>
+        </div>
+        <div class="price-item">
+          <div class="price-label">Wind</div>
+          <div id="cond-wind" style="font-size:14px; font-weight:600; color:var(--cream);">--</div>
+        </div>
+        <div class="price-item">
+          <div class="price-label">Swell Direction</div>
+          <div id="cond-dir" style="font-size:14px; font-weight:600; color:var(--cream);">-- <span class="wind-arrow" id="windArrow">↑</span></div>
+        </div>
+        <div class="price-item" style="border:none;">
+          <div class="price-label">Rain Chance</div>
+          <div id="cond-rain" style="font-size:14px; font-weight:600; color:var(--cream);">--%</div>
+        </div>
+      </div>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: ALERTS -->
+    <div class="screen" id="screen-alerts">
+      <div id="typhoon-banner"></div>
+      <div id="storm-banner"></div>
+      <div id="wind-banner"></div>
+      <div id="rain-banner"></div>
+
+      <div class="card">
+        <div class="card-label">Signal Details</div>
+        <div id="signal-detail" style="font-size:13px; color:var(--muted); line-height:1.6;">Loading alert data...</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Current Conditions</div>
+        <div class="price-item">
+          <div class="price-label">Wind Speed</div>
+          <div id="al-wind" style="font-size:15px; font-weight:600; color:var(--cream);">-- km/h</div>
+        </div>
+        <div class="price-item">
+          <div class="price-label">Wave Height</div>
+          <div id="al-wave" style="font-size:15px; font-weight:600; color:var(--cream);">-- m</div>
+        </div>
+        <div class="price-item" style="border:none;">
+          <div class="price-label">Rain Probability</div>
+          <div id="al-rain" style="font-size:15px; font-weight:600; color:var(--cream);">--%</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Important Links</div>
+        <div style="font-size:13px; color:var(--muted); line-height:2;">
+          🌐 <a href="https://bagong.pagasa.dost.gov.ph" target="_blank" style="color:var(--foam);">PAGASA Official</a><br>
+          🌐 <a href="https://www.phivolcs.dost.gov.ph" target="_blank" style="color:var(--foam);">PHIVOLCS Earthquakes</a><br>
+          🌐 <a href="https://www.ndrrmc.gov.ph" target="_blank" style="color:var(--foam);">NDRRMC Advisories</a>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:var(--muted); text-align:center; padding: 8px 0 4px;">
+        Alert estimates based on live wind & wave data.<br>Always verify with official PAGASA bulletins.
+      </div>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: ISLAND LIFE -->
+    <div class="screen" id="screen-islandlife">
+      <div class="card">
+        <div class="card-label">Dapa Ferry Schedule</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px;">Dapa Port ↔ Surigao City · Approximate times</div>
+        <div class="ferry-grid" id="ferryGrid"></div>
+        <div style="font-size:11px; color:var(--muted); margin-top:10px;">
+          Dapa Port info: <a href="tel:+63862110001" style="color:var(--foam);">(086) 211-0001</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Connectivity</div>
+        <div class="price-item">
+          <div class="price-label">Starlink / WiFi</div>
+          <div id="il-wifi" style="font-size:14px; font-weight:600; color:var(--good);">Checking...</div>
+        </div>
+        <div class="price-item" style="border:none;">
+          <div class="price-label">Last Data Sync</div>
+          <div id="il-sync" style="font-size:14px; font-weight:600; color:var(--cream);">--</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">About Siargao</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+          🏄 World-class surfing at <strong style="color:var(--cream);">Cloud 9</strong><br>
+          🌊 Best surf season: <strong style="color:var(--cream);">Aug – Nov</strong><br>
+          ⛴️ Nearest port: <strong style="color:var(--cream);">Dapa, ~45 mins from Gen. Luna</strong><br>
+          🏥 Hospital: <strong style="color:var(--cream);">Dapa General Hospital</strong><br>
+          🛫 Airport: <strong style="color:var(--cream);">Sayak Airport (IAO)</strong><br>
+          🌐 Municipality: <strong style="color:var(--cream);">General Luna, Surigao del Norte</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Useful Numbers</div>
+        <div style="font-size:13px; color:var(--muted); line-height:2.2;">
+          Van Service: <strong style="color:var(--cream);">0926 447 8616</strong><br>
+          Tourist Police: <strong style="color:var(--cream);">(086) 826-1111</strong><br>
+          LGU Gen. Luna: <strong style="color:var(--cream);">(086) 232-0011</strong>
+        </div>
+      </div>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: EMERGENCY -->
+    <div class="screen" id="screen-emergency">
+      <div class="alert-banner warn" style="margin-bottom:12px;">
+        <div class="alert-icon">⚠️</div>
+        <div>
+          <div class="alert-title warn">Emergency Contacts</div>
+          <div class="alert-desc">Siargao Island · Surigao del Norte. National Emergency: <strong>911</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Emergency Services</div>
+        <div class="emergency-item">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">National Emergency Hotline</div><div class="emergency-num">911</div></div>
+          <a href="tel:911" class="call-btn">Call</a>
+        </div>
+        <div class="emergency-item">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">Philippine Coast Guard</div><div class="emergency-num">(086) 211-3000</div></div>
+          <a href="tel:+63862113000" class="call-btn">Call</a>
+        </div>
+        <div class="emergency-item">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">BFP Siargao (Fire)</div><div class="emergency-num">(086) 211-1466</div></div>
+          <a href="tel:+63862111466" class="call-btn">Call</a>
+        </div>
+        <div class="emergency-item">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">LGU General Luna</div><div class="emergency-num">(086) 232-0011</div></div>
+          <a href="tel:+63862320011" class="call-btn">Call</a>
+        </div>
+        <div class="emergency-item">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">Dapa General Hospital</div><div class="emergency-num">(086) 211-1268</div></div>
+          <a href="tel:+63862111268" class="call-btn">Call</a>
+        </div>
+        <div class="emergency-item" style="border:none;">
+          <div class="emergency-dot"></div>
+          <div><div class="emergency-name">PNP Siargao</div><div class="emergency-num">(086) 211-1234</div></div>
+          <a href="tel:+63862111234" class="call-btn">Call</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Medical</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.8;">
+          <strong style="color:var(--cream);">Dapa General Hospital</strong><br>
+          Poblacion, Dapa, Surigao del Norte<br>
+          ~45 minutes from General Luna<br><br>
+          <strong style="color:var(--cream);">Tip:</strong> For diving accidents, contact
+          <a href="https://www.diveresort.net/siargao" target="_blank" style="color:var(--foam);">nearest dive center</a>
+          for hyperbaric chamber referral.
+        </div>
+      </div>
+      <div class="safe-bottom"></div>
+    </div>
+
+    <!-- SCREEN: FORECAST -->
+    <div class="screen" id="screen-forecast">
+      <div class="card">
+        <div class="card-label">7-Day Surf Outlook</div>
+        <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Daily max wave height & best surf rating · Cloud 9 area</div>
+        <div id="surfForecastList">
+          <div class="loading-state" style="padding:20px">
+            <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="loading-text">Loading surf forecast...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Wave Height Trend</div>
+        <div id="waveChart" style="padding-top:8px;">
+          <div class="loading-state" style="padding:14px">
+            <div class="loading-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Best Surf Day This Week</div>
+        <div id="bestDay" style="font-size:13px; color:var(--muted); line-height:1.6;">Calculating...</div>
+      </div>
+
+      <button class="refresh-btn" onclick="refreshAll()">↻ Refresh Forecast</button>
+      <div class="safe-bottom"></div>
+    </div>
+
+  </div><!-- end screens -->
+</div><!-- end app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const STATE = JSON.parse(localStorage.getItem('sis_state') || '{}');
+
+let weatherData = null;
+let marineData  = null;
+let lastSync    = null;
+
+const LAT = 9.8015, LON = 126.1115;
+const FERRY_TIMES = ['06:00','08:00','10:00','12:00','14:00','16:00','18:00'];
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  const opts = { timeZone: 'Asia/Manila' };
+  const ph = new Date(now.toLocaleString('en-US', opts));
+  let h = ph.getHours(), m = ph.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('headerClock').textContent = `${h}:${String(m).padStart(2,'0')}`;
+  document.getElementById('headerAmpm').textContent = ampm;
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('headerDate').textContent = `${days[ph.getDay()]}, ${months[ph.getMonth()]} ${ph.getDate()}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============================================================
+// NAV
+// ============================================================
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('screen-' + item.dataset.screen).classList.add('active');
+    if (item.dataset.screen === 'tide') renderTide();
+    if (item.dataset.screen === 'activities') renderActivities();
+    if (item.dataset.screen === 'alerts') renderAlerts();
+    if (item.dataset.screen === 'islandlife') renderIslandLife();
+    if (item.dataset.screen === 'forecast') renderForecast();
+  });
+});
+
+// ============================================================
+// FETCH WEATHER
+// ============================================================
+async function fetchWeather() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+      `&current=temperature_2m,relative_humidity_2m,weathercode,windspeed_10m,winddirection_10m,uv_index,precipitation_probability` +
+      `&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset` +
+      `&timezone=Asia%2FManila&forecast_days=5`;
+    const res = await fetch(url);
+    const data = await res.json();
+    weatherData = data;
+    lastSync = new Date();
+    renderOcean();
+    renderActivities();
+    renderAlerts();
+    renderIslandLife();
+    document.getElementById('offlineBadge').classList.remove('show');
+  } catch(e) {
+    console.error('Weather fetch failed:', e);
+    document.getElementById('offlineBadge').classList.add('show');
+    showToast('Using cached data — check connection');
+  }
+}
+
+async function fetchMarine() {
+  try {
+    const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}` +
+      `&current=wave_height,wave_period,wave_direction,sea_surface_temperature` +
+      `&daily=wave_height_max,wave_period_max,wave_direction_dominant` +
+      `&timezone=Asia%2FManila&forecast_days=7`;
+    const res = await fetch(url);
+    const data = await res.json();
+    marineData = data;
+    renderOcean();
+    renderTide();
+    renderActivities();
+    renderForecast();
+  } catch(e) {
+    console.error('Marine fetch failed:', e);
+  }
+}
+
+async function refreshAll() {
+  showToast('Refreshing...');
+  await Promise.all([fetchWeather(), fetchMarine()]);
+  showToast('✓ Data updated');
+}
+
+// ============================================================
+// RENDER OCEAN
+// ============================================================
+function renderOcean() {
+  if (!weatherData) return;
+  const cur = weatherData.current;
+  const daily = weatherData.daily;
+
+  // Hero
+  const wh = marineData ? marineData.current.wave_height.toFixed(1) : '--';
+  const emoji = weatherEmoji(cur.weathercode);
+  const desc = weatherDesc(cur.weathercode);
+
+  document.getElementById('ocean-hero').innerHTML = `
+    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+      <div>
+        <div class="hero-main">${Math.round(cur.temperature_2m)}<span class="hero-unit">°C</span></div>
+        <div class="hero-label">Air Temperature</div>
+        <div class="hero-desc">${emoji} ${desc}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Fraunces',serif; font-size:48px; font-weight:300; color:var(--foam); line-height:1;">${wh}<span style="font-size:18px; color:var(--muted);">m</span></div>
+        <div style="font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:4px;">Wave Height</div>
+        <div style="font-size:12px; color:var(--sand); margin-top:4px;">Cloud 9 area</div>
+      </div>
+    </div>`;
+
+  // Stats
+  document.getElementById('os-wind').textContent = Math.round(cur.windspeed_10m);
+  document.getElementById('os-humid').textContent = Math.round(cur.relative_humidity_2m);
+  document.getElementById('os-period').textContent = marineData ? Math.round(marineData.current.wave_period) : '--';
+  document.getElementById('os-water').textContent = marineData ? Math.round(marineData.current.sea_surface_temperature) : '--';
+  document.getElementById('os-uv').textContent = cur.uv_index.toFixed(1);
+  document.getElementById('os-rain').textContent = Math.round(cur.precipitation_probability);
+
+  // Sunrise/sunset
+  if (daily.sunrise && daily.sunrise[0]) {
+    const sr = daily.sunrise[0].split('T')[1]?.slice(0,5) || '--';
+    const ss = daily.sunset[0].split('T')[1]?.slice(0,5) || '--';
+    document.getElementById('os-sunrise').textContent = formatTime(sr);
+    document.getElementById('os-sunset').textContent = formatTime(ss);
+  }
+
+  // Forecast
+  const fl = document.getElementById('forecast-list');
+  const dayNames = ['Today','Tomorrow','Wed','Thu','Fri','Sat','Sun'];
+  const now = new Date();
+  fl.innerHTML = daily.time.map((date, i) => {
+    const d = new Date(date);
+    const name = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-PH', {weekday:'short'});
+    return `<div class="forecast-row">
+      <div class="forecast-day">${name}</div>
+      <div class="forecast-icon">${weatherEmoji(daily.weathercode[i])}</div>
+      <div class="forecast-desc">${weatherDesc(daily.weathercode[i])}</div>
+      <div>
+        <div class="forecast-temp">${Math.round(daily.temperature_2m_min[i])}–${Math.round(daily.temperature_2m_max[i])}°</div>
+        <div class="forecast-rain">💧 ${(daily.precipitation_sum[i] || 0).toFixed(1)}mm</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// RENDER TIDE
+// ============================================================
+function renderTide() {
+  const now = new Date();
+  const phNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+  const hour = phNow.getHours() + phNow.getMinutes() / 60;
+
+  const cycle = 12.42;
+  const phase = (hour % cycle) / cycle;
+  const pct = Math.round(50 + 50 * Math.sin(phase * 2 * Math.PI));
+
+  document.getElementById('tideFill').style.height = pct + '%';
+  document.getElementById('tidePct').textContent = pct + '%';
+  document.getElementById('tideDirection').textContent = pct > 50 ? '↑ INCOMING' : '↓ OUTGOING';
+
+  // High / low times
+  const hoursToHigh = cycle * (1 - phase);
+  const highH = (hour + hoursToHigh) % 24;
+  const lowH  = (highH + cycle / 2) % 24;
+
+  document.getElementById('tide-high-time').textContent = formatHour(highH);
+  document.getElementById('tide-low-time').textContent  = formatHour(lowH);
+
+  const wh = marineData ? marineData.current.wave_height : 0;
+  document.getElementById('tide-high-h').textContent = (1.2 + wh * 0.3).toFixed(1) + ' m est.';
+  document.getElementById('tide-low-h').textContent  = '0.2 m est.';
+  document.getElementById('tide-wave').textContent   = marineData ? marineData.current.wave_height.toFixed(1) : '--';
+
+  // Best windows
+  const surfWindow = hour < 7 ? '6–10 AM' : hour < 11 ? 'Now – 12PM' : '6AM Tomorrow';
+  const snorkWindow = pct < 35 ? 'Now (Low Tide)' : formatHour(lowH);
+  const hopWindow = (wh < 1.0 && (weatherData?.current?.windspeed_10m || 99) < 20) ? 'Anytime today' : hour < 10 ? '9AM – 12PM' : 'Tomorrow AM';
+
+  document.getElementById('tw-surf').textContent     = surfWindow;
+  document.getElementById('tw-snorkel').textContent  = snorkWindow;
+  document.getElementById('tw-islandhop').textContent = hopWindow;
+}
+
+// ============================================================
+// RENDER ACTIVITIES
+// ============================================================
+function renderActivities() {
+  const wh  = marineData?.current?.wave_height || 0;
+  const wp  = marineData?.current?.wave_period || 0;
+  const wd  = marineData?.current?.wave_direction || 0;
+  const ws  = weatherData?.current?.windspeed_10m || 0;
+  const rp  = weatherData?.current?.precipitation_probability || 0;
+
+  // Surf score
+  let score = 40;
+  if (wh >= 1.0 && wh <= 2.5) score += 25;
+  else if (wh >= 0.5) score += 10;
+  else if (wh > 2.5)  score -= 5;
+  else score -= 15;
+
+  if (wd >= 45 && wd <= 120) score += 15;  // Offshore/NE
+  else score -= 5;
+
+  if (ws < 15) score += 10;
+  else if (ws > 30) score -= 15;
+
+  if (rp > 70) score -= 10;
+  score = Math.max(0, Math.min(100, score));
+
+  let quality, qClass;
+  if (score >= 75)      { quality = '🤙 Perfect';  qClass = 'quality-perfect'; }
+  else if (score >= 55) { quality = '✓ Good';       qClass = 'quality-good'; }
+  else if (score >= 35) { quality = '~ Fair';       qClass = 'quality-fair'; }
+  else                  { quality = '✗ Poor';       qClass = 'quality-poor'; }
+
+  document.getElementById('scoreVal').textContent = score;
+  const badge = document.getElementById('qualityBadge');
+  badge.textContent = quality;
+  badge.className = `quality-badge ${qClass}`;
+
+  const bar = document.getElementById('scoreBar');
+  bar.style.width = score + '%';
+  bar.style.background = score >= 75 ? 'var(--good)' : score >= 55 ? 'var(--foam)' : score >= 35 ? 'var(--fair)' : 'var(--poor)';
+
+  const ring = document.getElementById('scoreRing');
+  const ringColor = score >= 75 ? 'var(--good)' : score >= 55 ? 'var(--foam)' : score >= 35 ? 'var(--fair)' : 'var(--poor)';
+  ring.style.border = `3px solid ${ringColor}`;
+  ring.style.boxShadow = `0 0 20px ${ringColor}30`;
+  document.getElementById('scoreVal').style.color = ringColor;
+
+  document.getElementById('condSummary').textContent =
+    `${wh.toFixed(1)}m waves · ${Math.round(ws)}km/h wind · ${Math.round(rp)}% rain · Direction: ${directionName(wd)}`;
+
+  // Windows
+  const phNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+  const hour = phNow.getHours();
+
+  const surfWindow  = hour < 7 ? '6–10 AM' : hour < 11 ? 'Now – 12PM' : '6AM Tomorrow';
+  const hopWindow   = (wh < 1.0 && ws < 20) ? 'Anytime today' : hour < 10 ? '9AM – 12PM' : 'Tomorrow AM';
+  const snorkWindow = hour < 10 ? '7AM – 11AM' : hour < 14 ? 'Now (check tide)' : 'Tomorrow AM';
+  const lagoonWindow = (wh < 0.8 && ws < 15) ? '8AM – 3PM' : 'Check conditions';
+
+  document.getElementById('act-surf').textContent      = surfWindow;
+  document.getElementById('act-islandhop').textContent = hopWindow;
+  document.getElementById('act-snorkel').textContent   = snorkWindow;
+  document.getElementById('act-lagoon').textContent    = lagoonWindow;
+
+  // Conditions detail
+  document.getElementById('cond-wave').textContent = `${wh.toFixed(1)}m`;
+  document.getElementById('cond-wind').textContent = `${Math.round(ws)} km/h`;
+  document.getElementById('cond-dir').textContent  = directionName(wd);
+  document.getElementById('cond-rain').textContent = `${Math.round(rp)}%`;
+
+  // Wind arrow
+  document.getElementById('windArrow').style.transform = `rotate(${wd}deg)`;
+}
+
+// ============================================================
+// RENDER ALERTS
+// ============================================================
+function renderAlerts() {
+  const ws = weatherData?.current?.windspeed_10m || 0;
+  const wh = marineData?.current?.wave_height || 0;
+  const rp = weatherData?.current?.precipitation_probability || 0;
+  const wc = weatherData?.current?.weathercode || 0;
+
+  let signal = 0;
+  if (ws > 120) signal = 4;
+  else if (ws > 90) signal = 3;
+  else if (ws > 60) signal = 2;
+  else if (ws > 30 && wc >= 80) signal = 1;
+
+  const stormSurge = signal >= 2 && wh > 2.5;
+
+  // Typhoon banner
+  const typhoonEl = document.getElementById('typhoon-banner');
+  if (signal === 0) {
+    typhoonEl.innerHTML = `<div class="alert-banner clear">
+      <div class="alert-icon">✅</div>
+      <div><div class="alert-title clear">No Typhoon Signal</div>
+      <div class="alert-desc">No active tropical cyclone affecting Surigao del Norte.</div></div></div>`;
+  } else {
+    const dangerClass = signal >= 3 ? 'danger' : 'warn';
+    typhoonEl.innerHTML = `<div class="alert-banner ${dangerClass}">
+      <div class="alert-icon">${signal >= 3 ? '🚨' : '⚠️'}</div>
+      <div><div class="alert-title ${dangerClass}">TYPHOON SIGNAL ${signal}</div>
+      <div class="alert-desc">${typhoonDesc(signal)}</div></div></div>`;
+
+    if (signal >= 2) {
+      document.getElementById('typhoonOverlay').classList.add('active');
+    }
+  }
+
+  // Storm surge
+  const stormEl = document.getElementById('storm-banner');
+  stormEl.innerHTML = stormSurge
+    ? `<div class="alert-banner danger"><div class="alert-icon">🌊</div><div>
+        <div class="alert-title danger">Storm Surge Warning</div>
+        <div class="alert-desc">High waves (${wh.toFixed(1)}m) with strong winds. Avoid coastal areas.</div></div></div>`
+    : `<div class="alert-banner clear"><div class="alert-icon">🌊</div><div>
+        <div class="alert-title clear">No Storm Surge</div>
+        <div class="alert-desc">Coastal conditions normal. Wave height: ${wh.toFixed(1)}m.</div></div></div>`;
+
+  // Wind
+  const windEl = document.getElementById('wind-banner');
+  const windClass = ws > 50 ? 'danger' : ws > 30 ? 'warn' : 'clear';
+  const windMsg = ws > 50 ? 'Strong wind warning. Avoid open water.' : ws > 30 ? 'Moderate winds. Use caution at sea.' : 'Wind conditions normal.';
+  windEl.innerHTML = `<div class="alert-banner ${windClass}"><div class="alert-icon">💨</div><div>
+    <div class="alert-title ${windClass}">Wind: ${Math.round(ws)} km/h</div>
+    <div class="alert-desc">${windMsg}</div></div></div>`;
+
+  // Rain
+  const rainEl = document.getElementById('rain-banner');
+  const rainClass = rp > 70 ? 'warn' : 'clear';
+  rainEl.innerHTML = `<div class="alert-banner ${rainClass}"><div class="alert-icon">${rp > 70 ? '🌧️' : '⛅'}</div><div>
+    <div class="alert-title ${rainClass}">${rp > 70 ? 'Heavy Rain Expected' : 'Rain Chance: ' + Math.round(rp) + '%'}</div>
+    <div class="alert-desc">${rp > 70 ? 'Expect heavy rainfall. Prepare accordingly.' : 'Weather relatively clear.'}</div></div></div>`;
+
+  // Detail
+  document.getElementById('signal-detail').innerHTML = typhoonDetailDesc(signal);
+  document.getElementById('al-wind').textContent = Math.round(ws) + ' km/h';
+  document.getElementById('al-wave').textContent = wh.toFixed(1) + ' m';
+  document.getElementById('al-rain').textContent = Math.round(rp) + '%';
+}
+
+// ============================================================
+// RENDER ISLAND LIFE
+// ============================================================
+function renderIslandLife() {
+  // Ferry
+  const phNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+  const curMin = phNow.getHours() * 60 + phNow.getMinutes();
+  let nextIdx = -1;
+
+  const grid = document.getElementById('ferryGrid');
+  grid.innerHTML = FERRY_TIMES.map((t, i) => {
+    const [fh, fm] = t.split(':').map(Number);
+    const fMin = fh * 60 + fm;
+    const passed = fMin < curMin;
+    const isNext = !passed && nextIdx === -1 ? (nextIdx = i, true) : false;
+    return `<div class="ferry-chip ${isNext ? 'next' : passed ? 'passed' : ''}">${t}</div>`;
+  }).join('');
+
+  // Wifi
+  document.getElementById('il-wifi').textContent = navigator.onLine ? 'Online' : 'Offline';
+  document.getElementById('il-wifi').style.color = navigator.onLine ? 'var(--good)' : 'var(--poor)';
+  document.getElementById('il-sync').textContent = lastSync ? lastSync.toLocaleTimeString('en-PH', { timeZone: 'Asia/Manila', hour:'2-digit', minute:'2-digit' }) : 'Not yet';
+}
+
+// ============================================================
+// RENDER FORECAST (7-day surf outlook)
+// ============================================================
+function renderForecast() {
+  if (!marineData || !marineData.daily) return;
+  const daily = marineData.daily;
+  const wDaily = weatherData?.daily;
+
+  // Score each day
+  const days = daily.time.map((date, i) => {
+    const wh = daily.wave_height_max[i] || 0;
+    const wp = daily.wave_period_max ? daily.wave_period_max[i] : 0;
+    const wd = daily.wave_direction_dominant ? daily.wave_direction_dominant[i] : 0;
+    const rain = wDaily?.precipitation_sum?.[i] || 0;
+
+    let score = 40;
+    if (wh >= 1.0 && wh <= 2.5) score += 30;
+    else if (wh >= 0.5) score += 12;
+    else if (wh > 2.5) score -= 5;
+    else score -= 15;
+    if (wd >= 45 && wd <= 120) score += 15;
+    if (rain > 15) score -= 12;
+    if (wp >= 8) score += 8;
+    score = Math.max(0, Math.min(100, score));
+
+    return { date, wh, wp, wd, rain, score };
+  });
+
+  // Forecast list
+  const list = document.getElementById('surfForecastList');
+  list.innerHTML = days.map((d, i) => {
+    const dt = new Date(d.date);
+    const name = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : dt.toLocaleDateString('en-PH', { weekday: 'long' });
+    const color = d.score >= 75 ? 'var(--good)' : d.score >= 55 ? 'var(--foam)' : d.score >= 35 ? 'var(--fair)' : 'var(--poor)';
+    const label = d.score >= 75 ? 'Perfect' : d.score >= 55 ? 'Good' : d.score >= 35 ? 'Fair' : 'Poor';
+    return `<div class="forecast-row">
+      <div style="width:74px; flex-shrink:0;">
+        <div style="font-size:13px; color:var(--cream); font-weight:600;">${name}</div>
+        <div style="font-size:10px; color:var(--muted);">${dt.toLocaleDateString('en-PH',{month:'short',day:'numeric'})}</div>
+      </div>
+      <div style="flex:1;">
+        <div class="progress-track" style="margin:2px 0;">
+          <div class="progress-fill" style="width:${d.score}%; background:${color};"></div>
+        </div>
+        <div style="font-size:10px; color:var(--muted); margin-top:3px;">${d.wh.toFixed(1)}m · ${directionName(d.wd)} · ${Math.round(d.wp)}s period</div>
+      </div>
+      <div style="text-align:right; width:54px; flex-shrink:0;">
+        <div style="font-size:12px; font-weight:700; color:${color};">${label}</div>
+        <div style="font-size:10px; color:var(--muted);">${d.score}/100</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wave height bar chart
+  const maxWave = Math.max(...days.map(d => d.wh), 1);
+  const chart = document.getElementById('waveChart');
+  chart.innerHTML = `<div style="display:flex; align-items:flex-end; justify-content:space-between; height:100px; gap:6px;">` +
+    days.map((d, i) => {
+      const h = Math.max(8, (d.wh / maxWave) * 90);
+      const color = d.score >= 75 ? 'var(--good)' : d.score >= 55 ? 'var(--foam)' : d.score >= 35 ? 'var(--fair)' : 'var(--poor)';
+      const dt = new Date(d.date);
+      const dayLetter = i === 0 ? 'Now' : dt.toLocaleDateString('en-PH', { weekday: 'short' }).slice(0,1);
+      return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <div style="font-size:9px; color:var(--cream);">${d.wh.toFixed(1)}</div>
+        <div style="width:100%; height:${h}px; background:linear-gradient(180deg, ${color}, ${color}40); border-radius:4px 4px 0 0;"></div>
+        <div style="font-size:9px; color:var(--muted);">${dayLetter}</div>
+      </div>`;
+    }).join('') + `</div>
+    <div style="font-size:10px; color:var(--muted); text-align:center; margin-top:8px;">Max wave height (m) per day</div>`;
+
+  // Best day
+  const best = days.reduce((a, b) => b.score > a.score ? b : a, days[0]);
+  const bestIdx = days.indexOf(best);
+  const bestDt = new Date(best.date);
+  const bestName = bestIdx === 0 ? 'Today' : bestIdx === 1 ? 'Tomorrow' : bestDt.toLocaleDateString('en-PH', { weekday: 'long' });
+  document.getElementById('bestDay').innerHTML =
+    `🏄 <strong style="color:var(--good);">${bestName}</strong> looks best with <strong style="color:var(--cream);">${best.wh.toFixed(1)}m</strong> waves from the <strong style="color:var(--cream);">${directionName(best.wd)}</strong> and a surf score of <strong style="color:var(--good);">${best.score}/100</strong>. Plan your session early morning for cleanest conditions.`;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function formatHour(h) {
+  const hInt = Math.floor(h);
+  const mInt = Math.round((h - hInt) * 60);
+  const ampm = hInt >= 12 ? 'PM' : 'AM';
+  const h12  = hInt % 12 || 12;
+  return `${h12}:${String(mInt).padStart(2,'0')} ${ampm}`;
+}
+
+function formatTime(hhmm) {
+  if (!hhmm || hhmm === '--') return '--';
+  const [h, m] = hhmm.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  return `${h % 12 || 12}:${String(m).padStart(2,'0')}${ampm}`;
+}
+
+function directionName(deg) {
+  const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
+function weatherEmoji(code) {
+  if (code === 0)  return '☀️';
+  if (code <= 2)   return '⛅';
+  if (code <= 3)   return '☁️';
+  if (code <= 49)  return '🌫️';
+  if (code <= 55)  return '🌦️';
+  if (code <= 67)  return '🌧️';
+  if (code <= 77)  return '🌨️';
+  if (code <= 82)  return '🌦️';
+  if (code <= 99)  return '⛈️';
+  return '🌤️';
+}
+
+function weatherDesc(code) {
+  if (code === 0)  return 'Clear sky';
+  if (code <= 2)   return 'Partly cloudy';
+  if (code <= 3)   return 'Overcast';
+  if (code <= 49)  return 'Foggy';
+  if (code <= 55)  return 'Drizzle';
+  if (code <= 67)  return 'Rainy';
+  if (code <= 77)  return 'Snowy';
+  if (code <= 82)  return 'Rain showers';
+  if (code <= 99)  return 'Thunderstorm';
+  return 'Variable';
+}
+
+function typhoonDesc(s) {
+  const d = [
+    'No tropical cyclone affecting the area.',
+    'Tropical Depression. Winds 60–88 km/h. Minimal disruption.',
+    'Tropical Storm. Winds 89–117 km/h. Prepare and monitor.',
+    'Severe Tropical Storm. Winds 118–220 km/h. Evacuation advised.',
+    'Typhoon. Winds >220 km/h. Mandatory evacuation.',
+    'Super Typhoon. Catastrophic. Follow all emergency orders.'
+  ];
+  return d[Math.min(s, 5)];
+}
+
+function typhoonDetailDesc(s) {
+  if (s === 0) return `<strong style="color:var(--good)">All Clear</strong> — No tropical cyclone within the Philippine Area of Responsibility affecting Surigao del Norte. Normal weather expected.<br><br>Estimates based on live wind speed data. Always verify at <a href="https://bagong.pagasa.dost.gov.ph" target="_blank" style="color:var(--foam)">PAGASA.dost.gov.ph</a>.`;
+  return `<strong style="color:var(--poor)">Signal ${s} conditions detected</strong><br><br>${typhoonDesc(s)}<br><br>⚠️ This is an estimate based on current wind data. Check official <a href="https://bagong.pagasa.dost.gov.ph" target="_blank" style="color:var(--foam)">PAGASA bulletins</a> immediately.`;
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// PWA INSTALL
+// ============================================================
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+  }
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  showToast('✓ App installed!');
+});
+
+// ============================================================
+// SERVICE WORKER (offline support)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'sis-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+    });
+    self.addEventListener('fetch', e => {
+      if (e.request.url.includes('api.open-meteo') || e.request.url.includes('marine-api')) {
+        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+      } else {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      }
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// ============================================================
+// AUTO REFRESH
+// ============================================================
+setInterval(fetchWeather, 10 * 60 * 1000);   // Every 10 min
+setInterval(fetchMarine,  15 * 60 * 1000);   // Every 15 min
+setInterval(renderTide,   60 * 1000);         // Every 1 min
+setInterval(renderIslandLife, 30 * 1000);     // Every 30 sec
+
+// ============================================================
+// INIT
+// ============================================================
+renderIslandLife();
+fetchWeather();
+fetchMarine();
+</script>
+</body>
+</html>
